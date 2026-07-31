@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Penjualan DLARD 2</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        .btn { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <h2>Aplikasi Pencatatan DLARD 2 Barbershop</h2>
+    <p>Klik tombol di bawah ini untuk mengunduh rekap Excel dengan format asli.</p>
+
+    <button id="downloadBtn" class="btn" onclick="downloadExcel()">Unduh Rekap Excel</button>
+    <p id="statusMsg"></p>
+
+    <script>
+        // Ganti dengan URL Aplikasi Web dari Google Apps Script Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycbwSMG25inH2xCj_lO6Bb3Cr6SLdBQJ30pKPWvI0-Lwf6FpHlGjNGQoMhlTj8z7M3zdG/exec";
+
+        async function downloadExcel() {
+            const btn = document.getElementById("downloadBtn");
+            const msg = document.getElementById("statusMsg");
+            
+            btn.disabled = true;
+            msg.innerText = "Memproses dan memformat Excel, mohon tunggu...";
+
+            try {
+                const response = await fetch(`${API_URL}?action=download`);
+                const data = await response.json();
+
+                if (data.downloadUrl) {
+                    msg.innerText = "Berhasil! Mengunduh file...";
+                    // Trigger download
+                    window.location.href = data.downloadUrl;
+                } else {
+                    msg.innerText = "Gagal mendapatkan tautan.";
+                }
+            } catch (error) {
+                console.error(error);
+                msg.innerText = "Terjadi kesalahan sistem.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
