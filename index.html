@@ -163,8 +163,25 @@
                 <!-- 1.B. TAB ANALISIS PRODUK (MENU BARU) -->
                 <div class="tab-pane fade" id="analisis_produk">
                     <div class="card p-4">
-                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-chart-simple text-primary me-2"></i> Analisis Penjualan Layanan</h4>
-                        <p class="text-muted small mb-4">Grafik total perbandingan kuantitas layanan yang di-checkout dari waktu ke waktu berdasarkan data ter-update.</p>
+                        <!-- Header & Filter -->
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                            <h4 class="fw-bold m-0"><i class="fa-solid fa-chart-simple text-primary me-2"></i> Analisis Penjualan Layanan</h4>
+                            
+                            <!-- Komponen Filter Khusus Analisis Produk -->
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="fw-semibold text-muted fs-6">Filter Waktu:</label>
+                                <select id="filterProductMode" class="form-select form-select-sm" onchange="updateProductFilterUI()">
+                                    <option value="all">Seluruh Waktu</option>
+                                    <option value="date">Per Tanggal</option>
+                                    <option value="month">Per Bulan</option>
+                                    <option value="year">Per Tahun</option>
+                                </select>
+                                <input type="date" id="inputFilterProductDate" class="form-control form-control-sm d-none" onchange="renderProductChart()">
+                                <input type="month" id="inputFilterProductMonth" class="form-control form-control-sm d-none" onchange="renderProductChart()">
+                                <select id="inputFilterProductYear" class="form-select form-select-sm d-none" onchange="renderProductChart()"></select>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-4">Grafik total perbandingan kuantitas layanan yang di-checkout berdasarkan filter waktu yang dipilih.</p>
                         
                         <div class="card p-3 bg-white border shadow-sm">
                             <div style="position: relative; height:400px;">
@@ -274,7 +291,7 @@
                 <div class="tab-pane fade" id="history">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> History & Manajemen Data</h4>
-                        <p class="text-muted small">Kelola riwayat input data (Penjualan, Pemasukan, Pengeluaran, Libur) per tanggal. Tekan tombol Hapus untuk mereset seluruh transaksi di tanggal tersebut dari server.</p>
+                        <p class="text-muted small">Kelola riwayat input data (Penjualan, Pemasukan, Pengeluaran, Libur) per tanggal. Klik <b>Lihat Detail</b> untuk rincian, atau Hapus untuk mereset seluruh transaksi pada tanggal tersebut.</p>
                         <hr class="text-muted mb-4">
                         
                         <!-- Tempat Render History Dinamis -->
@@ -338,6 +355,24 @@
     </div>
 </div>
 
+<!-- MODAL DETAIL HISTORY (FITUR BARU) -->
+<div class="modal fade" id="historyDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-circle-info me-2"></i> Rincian Tanggal: <span id="detailModalDate"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light" id="historyDetailBody">
+                <!-- Konten Rincian Transaksi Dit-render di sini oleh JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -362,11 +397,14 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date().toISOString().split('T')[0];
+        
+        // Inisialisasi Tanggal
         document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
         document.getElementById('excelMonth').value = today.slice(0, 7);
+        document.getElementById('inputFilterProductMonth').value = today.slice(0, 7); // Default Product chart filter
 
         initMenuCards();
-        populateYearDropdown();
+        populateYearDropdowns();
         fetchAllData();
     });
 
@@ -425,16 +463,20 @@
         ubahQty(item, 1);
     }
 
-    function populateYearDropdown() {
-        const yearSelect = document.getElementById('inputFilterYear');
+    function populateYearDropdowns() {
         const currentYear = new Date().getFullYear();
-        yearSelect.innerHTML = '';
-        for(let y = currentYear; y >= currentYear - 3; y--) {
-            let opt = document.createElement('option');
-            opt.value = y;
-            opt.textContent = y;
-            yearSelect.appendChild(opt);
-        }
+        const yearSelects = [document.getElementById('inputFilterYear'), document.getElementById('inputFilterProductYear')];
+        
+        yearSelects.forEach(selectEl => {
+            if(!selectEl) return;
+            selectEl.innerHTML = '';
+            for(let y = currentYear; y >= currentYear - 3; y--) {
+                let opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                selectEl.appendChild(opt);
+            }
+        });
     }
 
     // Ambil Data dari Backend
@@ -492,7 +534,7 @@
     }
 
     // ==========================================
-    // RENDER FUNGSI: HISTORY DATA & DELETE
+    // RENDER FUNGSI: HISTORY DATA, DETAIL MODAL, & DELETE
     // ==========================================
     function renderHistory() {
         const historyContainer = document.getElementById('historyContainer');
@@ -535,11 +577,16 @@
             
             let cardHTML = `
                 <div class="card mb-3 border-secondary shadow-sm">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-calendar-day me-2 text-primary"></i> Tanggal: ${date}</h6>
-                        <button class="btn btn-sm btn-outline-danger fw-bold shadow-sm" onclick="deleteDataByDate('${date}')">
-                            <i class="fa-solid fa-trash me-1"></i> Hapus Tanggal Ini
-                        </button>
+                        <div>
+                            <button class="btn btn-sm btn-info text-white fw-bold shadow-sm me-2" onclick="showHistoryDetail('${date}')">
+                                <i class="fa-solid fa-eye me-1"></i> Lihat Detail
+                            </button>
+                            <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="deleteDataByDate('${date}')">
+                                <i class="fa-solid fa-trash me-1"></i> Hapus
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body py-2">
                         <div class="row text-center small fw-semibold">
@@ -552,6 +599,81 @@
             `;
             historyContainer.innerHTML += cardHTML;
         });
+    }
+
+    function showHistoryDetail(dateString) {
+        document.getElementById('detailModalDate').innerText = dateString;
+        
+        let dayPenjualan = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === dateString);
+        let dayPemasukan = globalData.pemasukan.filter(r => String(r.tanggal || '').split('T')[0] === dateString);
+        let dayPengeluaran = globalData.pengeluaran.filter(r => String(r.tanggal || '').split('T')[0] === dateString);
+
+        let bodyHtml = '';
+
+        // Render Tabel Penjualan
+        bodyHtml += `<h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-cash-register me-1"></i> Produk Terjual</h6>`;
+        if(dayPenjualan.length > 0) {
+            bodyHtml += `<div class="table-responsive mb-3"><table class="table table-sm table-bordered bg-white">
+                <thead class="table-light"><tr><th>Item</th><th class="text-center">Qty</th><th class="text-end">Subtotal</th></tr></thead><tbody>`;
+            let totalPenj = 0;
+            dayPenjualan.forEach(p => {
+                let sub = Number(p.subtotal || 0);
+                totalPenj += sub;
+                bodyHtml += `<tr>
+                    <td class="text-capitalize">${String(p.item).replace('-', ' ')}</td>
+                    <td class="text-center">${p.qty}</td>
+                    <td class="text-end">Rp ${sub.toLocaleString('id-ID')}</td>
+                </tr>`;
+            });
+            bodyHtml += `<tr><th colspan="2" class="text-end">Total Penjualan:</th><th class="text-end text-primary">Rp ${totalPenj.toLocaleString('id-ID')}</th></tr>`;
+            bodyHtml += `</tbody></table></div>`;
+        } else {
+            bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada penjualan pada tanggal ini.</p>`;
+        }
+
+        // Render Tabel Pemasukan
+        bodyHtml += `<h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-wallet me-1"></i> Pemasukan Lain</h6>`;
+        if(dayPemasukan.length > 0) {
+            bodyHtml += `<ul class="list-group mb-3">`;
+            let totalPem = 0;
+            dayPemasukan.forEach(p => {
+                let nom = Number(p.nominal || 0);
+                totalPem += nom;
+                bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 small bg-white">
+                    ${p.keterangan} <span class="fw-bold text-success">Rp ${nom.toLocaleString('id-ID')}</span>
+                </li>`;
+            });
+            bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 bg-light fw-bold">
+                Total Pemasukan Lain <span class="text-success">Rp ${totalPem.toLocaleString('id-ID')}</span>
+            </li>`;
+            bodyHtml += `</ul>`;
+        } else {
+            bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada pemasukan lain pada tanggal ini.</p>`;
+        }
+
+        // Render Tabel Pengeluaran
+        bodyHtml += `<h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-receipt me-1"></i> Pengeluaran / Kasbon</h6>`;
+        if(dayPengeluaran.length > 0) {
+            bodyHtml += `<ul class="list-group mb-3">`;
+            let totalPeng = 0;
+            dayPengeluaran.forEach(p => {
+                let nom = Number(p.nominal || 0);
+                totalPeng += nom;
+                bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 small bg-white">
+                    ${p.keterangan} <span class="fw-bold text-danger">Rp ${nom.toLocaleString('id-ID')}</span>
+                </li>`;
+            });
+            bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 bg-light fw-bold">
+                Total Pengeluaran <span class="text-danger">Rp ${totalPeng.toLocaleString('id-ID')}</span>
+            </li>`;
+            bodyHtml += `</ul>`;
+        } else {
+            bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada pengeluaran pada tanggal ini.</p>`;
+        }
+
+        document.getElementById('historyDetailBody').innerHTML = bodyHtml;
+        const detailModal = new bootstrap.Modal(document.getElementById('historyDetailModal'));
+        detailModal.show();
     }
 
     function deleteDataByDate(dateString) {
@@ -672,15 +794,42 @@
     }
 
     // ==========================================
-    // RENDER FUNGSI: CHART ANALISIS PRODUK
+    // RENDER FUNGSI: FILTER & CHART ANALISIS PRODUK
     // ==========================================
+    function updateProductFilterUI() {
+        const mode = document.getElementById('filterProductMode').value;
+        document.getElementById('inputFilterProductDate').classList.add('d-none');
+        document.getElementById('inputFilterProductMonth').classList.add('d-none');
+        document.getElementById('inputFilterProductYear').classList.add('d-none');
+
+        if(mode === 'date') document.getElementById('inputFilterProductDate').classList.remove('d-none');
+        if(mode === 'month') document.getElementById('inputFilterProductMonth').classList.remove('d-none');
+        if(mode === 'year') document.getElementById('inputFilterProductYear').classList.remove('d-none');
+
+        renderProductChart();
+    }
+
     function renderProductChart() {
+        const mode = document.getElementById('filterProductMode').value;
+        const filterDate = document.getElementById('inputFilterProductDate').value;
+        const filterMonth = document.getElementById('inputFilterProductMonth').value;
+        const filterYear = document.getElementById('inputFilterProductYear').value;
+
+        // Filter Penjualan based on inputs
+        let filteredPenjualan = globalData.penjualan.filter(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if(mode === 'date') return tgl === filterDate;
+            if(mode === 'month') return tgl.startsWith(filterMonth);
+            if(mode === 'year') return tgl.startsWith(filterYear);
+            return true;
+        });
+
         const ctx = document.getElementById('productChart').getContext('2d');
         
         let qtyMap = {};
         URUTAN_MENU.forEach(m => qtyMap[m.toLowerCase()] = 0);
 
-        globalData.penjualan.forEach(r => {
+        filteredPenjualan.forEach(r => {
             let itemName = String(r.item).toLowerCase();
             let qty = Number(r.qty || 0);
             if(qtyMap[itemName] !== undefined) qtyMap[itemName] += qty;
