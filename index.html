@@ -5,97 +5,165 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart POS - DLARD 2 Barbershop</title>
     <style>
+        /* Skema Warna Mengikuti Referensi Gambar Anda */
         :root {
-            --bg-color: #f1f5f9;
-            --surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --primary: #2563eb;
-            --border: #e2e8f0;
-            --btn-bg: #64748b; /* Warna tombol sesuai SS */
-            --btn-hover: #475569;
+            --bg-body: #F8FAFC; /* Slate 50 */
+            --bg-surface: #FFFFFF;
+            --text-main: #0F172A; /* Slate 900 */
+            --text-muted: #64748B; /* Slate 500 */
+            --price-color: #2563EB; /* Biru */
+            --btn-checkout: #64748B; /* Slate 500 - Sesuai gambar */
+            --btn-checkout-hover: #475569; /* Slate 600 */
+            --btn-expense: #EF4444; /* Merah */
+            --btn-income: #10B981; /* Hijau */
+            --border: #E2E8F0; /* Slate 200 */
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         
-        body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+        body { background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Kiri: Menu */
-        .menu-section { flex: 1; padding: 30px; overflow-y: auto; }
-        .header h1 { font-size: 26px; color: var(--text-main); margin-bottom: 5px; }
-        .header p { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+        /* Kiri: Area Menu Utama */
+        .main-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         
-        .category-title { font-size: 18px; margin: 20px 0 15px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+        .header { padding: 24px 32px; background: var(--bg-surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .header-titles h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .header-titles p { color: var(--text-muted); font-size: 14px; }
+
+        /* Tombol Dinamis Pemasukan/Pengeluaran */
+        .dynamic-actions { display: flex; gap: 12px; }
+        .btn-action { 
+            padding: 10px 16px; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 14px; 
+            cursor: pointer; color: white; transition: opacity 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-action:hover { opacity: 0.9; }
+        .btn-expense { background-color: var(--btn-expense); }
+        .btn-income { background-color: var(--btn-income); }
+
+        .menu-scroll { flex: 1; padding: 24px 32px; overflow-y: auto; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .category-title { font-size: 18px; font-weight: 600; margin: 24px 0 16px; color: var(--text-muted); border-bottom: 2px solid var(--border); padding-bottom: 8px;}
+        .category-title:first-child { margin-top: 0; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
         
         .item-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-            padding: 20px; cursor: pointer; transition: all 0.2s ease;
+            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;
         }
-        .item-card:hover { border-color: var(--primary); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .item-name { font-weight: 600; font-size: 16px; margin-bottom: 10px; color: var(--text-main); }
-        .item-price { color: var(--primary); font-weight: bold; font-size: 15px; }
+        .item-card:hover { border-color: var(--price-color); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .item-name { font-weight: 600; font-size: 16px; color: var(--text-main); }
+        .item-price { color: var(--price-color); font-weight: 700; font-size: 16px; margin-top: 8px; }
 
-        /* Kanan: Struk */
+        /* Kanan: Sidebar Struk */
         .cart-section {
-            width: 400px; background: var(--surface); border-left: 1px solid var(--border);
-            display: flex; flex-direction: column;
+            width: 380px; background: var(--bg-surface); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; box-shadow: -4px 0 15px rgba(0,0,0,0.03); z-index: 10;
         }
-        .cart-header { padding: 30px 30px 20px 30px; border-bottom: 1px solid var(--border); }
-        .cart-header h2 { font-size: 20px; margin-bottom: 5px; }
+        .cart-header { padding: 24px; border-bottom: 1px solid var(--border); }
+        .cart-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .cart-header p { font-size: 13px; color: var(--text-muted); }
         
-        .cart-items { flex: 1; padding: 20px 30px; overflow-y: auto; }
-        .cart-empty { text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; font-size: 14px; }
+        .cart-items { flex: 1; padding: 24px; overflow-y: auto; }
+        .cart-empty { text-align: center; color: var(--text-muted); margin-top: 40px; font-style: italic; font-size: 14px; }
         
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border); }
-        .cart-item-info { flex: 1; }
-        .cart-item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-        .cart-item-price { color: var(--text-muted); font-size: 14px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); }
+        .cart-item-info { flex: 1; padding-right: 12px; }
+        .cart-item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; line-height: 1.3; }
+        .cart-item-price { color: var(--text-muted); font-size: 14px; font-weight: 500; }
         
-        .cart-controls { display: flex; align-items: center; gap: 12px; }
-        .btn-qty { background: var(--bg-color); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; color: var(--text-main); }
-        .btn-qty:hover { background: #e2e8f0; }
-        .qty-display { font-size: 15px; font-weight: 600; min-width: 20px; text-align: center; }
+        .cart-controls { display: flex; align-items: center; gap: 12px; background: var(--bg-body); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .btn-qty { background: var(--bg-surface); border: none; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; color: var(--text-main); box-shadow: var(--shadow-sm); }
+        .btn-qty:hover { background: #E2E8F0; }
+        .qty-display { font-size: 15px; font-weight: 700; min-width: 20px; text-align: center; }
 
-        .cart-footer { padding: 30px; }
-        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .cart-footer { padding: 24px; background: var(--bg-surface); border-top: 1px solid var(--border); }
+        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text-main); }
         
         .btn-checkout {
-            width: 100%; padding: 16px; background: var(--btn-bg); color: white; border: none;
-            border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;
+            width: 100%; padding: 16px; background: var(--btn-checkout); color: white; border: none;
+            border-radius: var(--radius-md); font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s;
         }
-        .btn-checkout:hover { background: var(--btn-hover); }
-        .btn-checkout:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .btn-checkout:hover { background: var(--btn-checkout-hover); }
+        .btn-checkout:disabled { background: #CBD5E1; cursor: not-allowed; }
 
-        @media (max-width: 800px) {
+        /* Modal / Pop-up Form Dinamis */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--bg-surface); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: scale(0.95); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        
+        .modal-header { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
+        .form-group input { 
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md);
+            font-size: 15px; outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: var(--price-color); }
+        
+        .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-cancel { flex: 1; padding: 12px; background: var(--bg-body); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; font-weight: 600; }
+        .btn-cancel:hover { background: #E2E8F0; }
+        .btn-submit { flex: 1; padding: 12px; border: none; border-radius: var(--radius-md); color: white; cursor: pointer; font-weight: 600; }
+
+        @media (max-width: 850px) {
             body { flex-direction: column; }
-            .cart-section { width: 100%; height: 50vh; border-left: none; border-top: 1px solid var(--border); }
-            .menu-section { height: 50vh; }
+            .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .cart-section { width: 100%; height: 45vh; border-left: none; border-top: 1px solid var(--border); }
+            .main-section { height: 55vh; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Area Menu Kiri -->
-    <div class="menu-section">
+    <!-- Area Kiri: Menu & Header -->
+    <div class="main-section">
         <div class="header">
-            <h1>DLARD 2 Barbershop POS</h1>
-            <p>Pilih layanan untuk menambahkannya ke struk tagihan.</p>
+            <div class="header-titles">
+                <h1>DLARD 2 Barbershop POS</h1>
+                <p>Pilih layanan untuk menambahkannya ke struk tagihan.</p>
+            </div>
+            <div class="dynamic-actions">
+                <button class="btn-action btn-expense" onclick="openModal('pengeluaran')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12H4"></path></svg>
+                    Pengeluaran
+                </button>
+                <button class="btn-action btn-income" onclick="openModal('pemasukan')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                    Pemasukan Lain
+                </button>
+            </div>
         </div>
 
-        <div class="category-title">Barber: Eka</div>
-        <div class="grid" id="gridEka"></div>
+        <div class="menu-scroll">
+            <div class="category-title">Barber: Eka</div>
+            <div class="grid" id="gridEka"></div>
 
-        <div class="category-title" style="margin-top: 30px;">Barber: Hudan</div>
-        <div class="grid" id="gridHudan"></div>
+            <div class="category-title" style="margin-top: 32px;">Barber: Hudan</div>
+            <div class="grid" id="gridHudan"></div>
+        </div>
     </div>
 
-    <!-- Area Struk Kanan -->
+    <!-- Area Kanan: Keranjang / Struk -->
     <div class="cart-section">
         <div class="cart-header">
             <h2>Struk Saat Ini</h2>
-            <div style="font-size: 13px; color: var(--text-muted);" id="dateDisplay"></div>
+            <p id="dateDisplay"></p>
         </div>
         
         <div class="cart-items" id="cartContainer">
@@ -107,22 +175,43 @@
                 <span>Total Bersih</span>
                 <span id="totalPrice">Rp0</span>
             </div>
-            <button class="btn-checkout" id="checkoutBtn" onclick="submitOrder()" disabled>Simpan ke Google Sheet</button>
+            <button class="btn-checkout" id="checkoutBtn" onclick="submitPenjualan()" disabled>Simpan Penjualan</button>
+        </div>
+    </div>
+
+    <!-- Modal Dinamis (Pengeluaran / Pemasukan) -->
+    <div class="modal-overlay" id="dynamicModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Catat Transaksi</div>
+            <div class="form-group">
+                <label for="inputKeterangan">Keterangan / Nama Item</label>
+                <input type="text" id="inputKeterangan" placeholder="Contoh: Beli Sapu / Uang Pomade" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="inputNominal">Nominal (Rp)</label>
+                <input type="number" id="inputNominal" placeholder="Contoh: 15000" autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-submit" id="btnSubmitModal" onclick="submitDynamic()">Simpan Data</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT DI SINI
+        // ==========================================
+        // ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT DI SINI
+        // ==========================================
         const API_URL = "https://script.google.com/macros/s/AKfycbyUDbLa0A5ArqnEfqTNgdRPgH1tCciw614IGalvbB3D1c7KhkKrXl-wkqkDuAxg0gfn/exec"; 
-
-        // Setup Data Tanggal, Bulan, Tahun
+        
+        // Setup Tanggal
         const now = new Date();
-        const tgl = now.getDate(); // 1 - 31
+        const tgl = now.getDate();
         const thn = now.getFullYear();
         const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const bln = namaBulan[now.getMonth()];
         
-        document.getElementById("dateDisplay").innerText = `Tanggal: ${tgl}/${now.getMonth()+1}/${thn}`;
+        document.getElementById("dateDisplay").innerText = `Tanggal: ${tgl} ${bln} ${thn}`;
 
         // Data Produk
         const menuData = {
@@ -141,8 +230,9 @@
         };
 
         let cart = {}; 
+        let currentModalType = ""; // 'pengeluaran' atau 'pemasukan'
 
-        // Fungsi Render UI Produk
+        // Render Produk
         function renderMenu() {
             const gridEka = document.getElementById("gridEka");
             const gridHudan = document.getElementById("gridHudan");
@@ -151,7 +241,6 @@
                 const card = document.createElement("div");
                 card.className = "item-card";
                 card.onclick = () => addToCart(id);
-                // Format angka misal: 35.000
                 const priceFormatted = item.price.toLocaleString("id-ID").replace(/,/g, '.');
                 
                 card.innerHTML = `
@@ -164,7 +253,7 @@
             }
         }
 
-        // Fungsi Keranjang
+        // Logic Keranjang
         function addToCart(id) {
             if (cart[id]) cart[id].qty++;
             else cart[id] = { qty: 1, data: menuData[id] };
@@ -190,7 +279,6 @@
                 count++;
                 const subtotal = item.data.price * item.qty;
                 total += subtotal;
-                
                 const priceFmt = item.data.price.toLocaleString("id-ID").replace(/,/g, '.');
 
                 container.innerHTML += `
@@ -218,31 +306,10 @@
             totalPriceEl.innerText = `Rp${total.toLocaleString("id-ID").replace(/,/g, '.')}`;
         }
 
-        // Fungsi Mengirim Data ke Google Sheets
-        async function submitOrder() {
-            const btn = document.getElementById("checkoutBtn");
-            const originalText = btn.innerText;
-            btn.innerText = "Menyimpan...";
-            btn.disabled = true;
-
-            // Merakit data untuk sheet
-            let itemsToSave = [];
-            for (let id in cart) {
-                itemsToSave.push({
-                    barber: cart[id].data.barber,
-                    nama: cart[id].data.name,
-                    harga: cart[id].data.price,
-                    qty: cart[id].qty,
-                    subtotal: cart[id].data.price * cart[id].qty
-                });
-            }
-
-            const payload = {
-                tanggal: tgl,
-                bulan: bln,
-                tahun: thn,
-                items: itemsToSave
-            };
+        // FUNGSI UTAMA FETCH KE GOOGLE SHEETS
+        async function sendToGoogleSheets(payload, btnElement, originalText) {
+            btnElement.innerText = "Menyimpan...";
+            btnElement.disabled = true;
 
             try {
                 const response = await fetch(API_URL, {
@@ -255,22 +322,88 @@
                 const result = await response.json();
 
                 if(result.status === "success") {
-                    alert("✅ Berhasil! Penjualan tersimpan di Sheet.");
-                    cart = {}; 
-                    updateCartUI();
+                    alert("✅ Data berhasil tersimpan di Google Sheets!");
+                    return true;
                 } else {
                     alert("❌ Gagal menyimpan: " + result.message);
+                    return false;
                 }
             } catch (error) {
                 console.error(error);
-                alert("⚠️ Terjadi kesalahan jaringan, pastikan URL API sudah benar.");
+                alert("⚠️ Terjadi kesalahan jaringan. Cek URL API.");
+                return false;
             } finally {
-                btn.innerText = originalText;
-                btn.disabled = Object.keys(cart).length === 0;
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
             }
         }
 
-        // Jalankan saat web dimuat
+        // Submit Keranjang Penjualan
+        async function submitPenjualan() {
+            let itemsToSave = {};
+            for (let id in cart) { itemsToSave[id] = cart[id].qty; }
+
+            const payload = {
+                tanggal: "tgl " + tgl,
+                bulan: bln,
+                tahun: thn,
+                tipe: "penjualan",
+                data: itemsToSave
+            };
+
+            const btn = document.getElementById("checkoutBtn");
+            const success = await sendToGoogleSheets(payload, btn, "Simpan Penjualan");
+            if (success) {
+                cart = {}; 
+                updateCartUI();
+            }
+        }
+
+        // Logic Modal Dinamis
+        function openModal(type) {
+            currentModalType = type;
+            document.getElementById("modalTitle").innerText = type === 'pengeluaran' ? "Catat Pengeluaran" : "Catat Pemasukan Tambahan";
+            
+            const btnSubmit = document.getElementById("btnSubmitModal");
+            btnSubmit.style.backgroundColor = type === 'pengeluaran' ? "var(--btn-expense)" : "var(--btn-income)";
+            
+            document.getElementById("inputKeterangan").value = "";
+            document.getElementById("inputNominal").value = "";
+            document.getElementById("dynamicModal").classList.add("active");
+        }
+
+        function closeModal() {
+            document.getElementById("dynamicModal").classList.remove("active");
+        }
+
+        async function submitDynamic() {
+            const ket = document.getElementById("inputKeterangan").value.trim();
+            const nom = document.getElementById("inputNominal").value;
+
+            if(!ket || !nom || nom <= 0) {
+                alert("Mohon isi keterangan dan nominal dengan benar.");
+                return;
+            }
+
+            let dataObj = {};
+            dataObj[ket] = parseInt(nom);
+
+            const payload = {
+                tanggal: "tgl " + tgl,
+                bulan: bln,
+                tahun: thn,
+                tipe: currentModalType,
+                data: dataObj
+            };
+
+            const btn = document.getElementById("btnSubmitModal");
+            const success = await sendToGoogleSheets(payload, btn, "Simpan Data");
+            if (success) {
+                closeModal();
+            }
+        }
+
+        // Inisialisasi
         renderMenu();
     </script>
 </body>
