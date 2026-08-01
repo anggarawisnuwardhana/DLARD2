@@ -6,72 +6,69 @@
     <title>Smart POS - DLARD 2 Barbershop</title>
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --bg-color: #F3F4F6;
-            --surface: #FFFFFF;
-            --text-main: #1F2937;
-            --text-muted: #6B7280;
-            --danger: #EF4444;
-            --border: #E5E7EB;
+            --bg-color: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --border: #e2e8f0;
+            --btn-bg: #64748b; /* Warna tombol sesuai SS */
+            --btn-hover: #475569;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Left Side: Menu Items */
-        .menu-section { flex: 1; padding: 20px; overflow-y: auto; }
-        .header { margin-bottom: 20px; }
-        .header h1 { font-size: 24px; color: var(--text-main); }
-        .header p { color: var(--text-muted); font-size: 14px; }
+        /* Kiri: Menu */
+        .menu-section { flex: 1; padding: 30px; overflow-y: auto; }
+        .header h1 { font-size: 26px; color: var(--text-main); margin-bottom: 5px; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
         
-        .category-title { font-size: 18px; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2px solid var(--border); }
+        .category-title { font-size: 18px; margin: 20px 0 15px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 8px;}
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         
         .item-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-            padding: 15px; cursor: pointer; transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+            padding: 20px; cursor: pointer; transition: all 0.2s ease;
         }
-        .item-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--primary); }
-        .item-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
-        .item-price { color: var(--primary); font-weight: bold; font-size: 14px; }
+        .item-card:hover { border-color: var(--primary); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .item-name { font-weight: 600; font-size: 16px; margin-bottom: 10px; color: var(--text-main); }
+        .item-price { color: var(--primary); font-weight: bold; font-size: 15px; }
 
-        /* Right Side: Cart / Order Summary */
+        /* Kanan: Struk */
         .cart-section {
-            width: 380px; background: var(--surface); border-left: 1px solid var(--border);
-            display: flex; flex-direction: column; box-shadow: -4px 0 15px rgba(0,0,0,0.03);
+            width: 400px; background: var(--surface); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column;
         }
-        .cart-header { padding: 20px; border-bottom: 1px solid var(--border); }
-        .cart-header h2 { font-size: 20px; }
+        .cart-header { padding: 30px 30px 20px 30px; border-bottom: 1px solid var(--border); }
+        .cart-header h2 { font-size: 20px; margin-bottom: 5px; }
         
-        .cart-items { flex: 1; padding: 20px; overflow-y: auto; }
-        .cart-empty { text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; }
+        .cart-items { flex: 1; padding: 20px 30px; overflow-y: auto; }
+        .cart-empty { text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; font-size: 14px; }
         
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border); }
         .cart-item-info { flex: 1; }
-        .cart-item-title { font-weight: 600; font-size: 14px; }
-        .cart-item-price { color: var(--text-muted); font-size: 13px; }
+        .cart-item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+        .cart-item-price { color: var(--text-muted); font-size: 14px; }
         
-        .cart-controls { display: flex; align-items: center; gap: 10px; }
-        .btn-qty { background: var(--bg-color); border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold; color: var(--text-main); }
-        .btn-qty:hover { background: #E5E7EB; }
-        .qty-display { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+        .cart-controls { display: flex; align-items: center; gap: 12px; }
+        .btn-qty { background: var(--bg-color); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; color: var(--text-main); }
+        .btn-qty:hover { background: #e2e8f0; }
+        .qty-display { font-size: 15px; font-weight: 600; min-width: 20px; text-align: center; }
 
-        .cart-footer { padding: 20px; border-top: 1px solid var(--border); background: var(--surface); }
-        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .cart-footer { padding: 30px; }
+        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
         
         .btn-checkout {
-            width: 100%; padding: 15px; background: var(--primary); color: white; border: none;
+            width: 100%; padding: 16px; background: var(--btn-bg); color: white; border: none;
             border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;
         }
-        .btn-checkout:hover { background: var(--primary-hover); }
-        .btn-checkout:disabled { background: var(--text-muted); cursor: not-allowed; }
+        .btn-checkout:hover { background: var(--btn-hover); }
+        .btn-checkout:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 800px) {
             body { flex-direction: column; }
             .cart-section { width: 100%; height: 50vh; border-left: none; border-top: 1px solid var(--border); }
             .menu-section { height: 50vh; }
@@ -80,7 +77,7 @@
 </head>
 <body>
 
-    <!-- Menu Section -->
+    <!-- Area Menu Kiri -->
     <div class="menu-section">
         <div class="header">
             <h1>DLARD 2 Barbershop POS</h1>
@@ -94,7 +91,7 @@
         <div class="grid" id="gridHudan"></div>
     </div>
 
-    <!-- Cart Section -->
+    <!-- Area Struk Kanan -->
     <div class="cart-section">
         <div class="cart-header">
             <h2>Struk Saat Ini</h2>
@@ -110,35 +107,42 @@
                 <span>Total Bersih</span>
                 <span id="totalPrice">Rp0</span>
             </div>
-            <button class="btn-checkout" id="checkoutBtn" onclick="submitOrder()">Simpan ke Google Sheet</button>
+            <button class="btn-checkout" id="checkoutBtn" onclick="submitOrder()" disabled>Simpan ke Google Sheet</button>
         </div>
     </div>
 
     <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT DI SINI
+        const API_URL = "https://script.google.com/macros/s/AKfycbyUDbLa0A5ArqnEfqTNgdRPgH1tCciw614IGalvbB3D1c7KhkKrXl-wkqkDuAxg0gfn/exec"; 
+
+        // Setup Data Tanggal, Bulan, Tahun
+        const now = new Date();
+        const tgl = now.getDate(); // 1 - 31
+        const thn = now.getFullYear();
+        const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const bln = namaBulan[now.getMonth()];
+        
+        document.getElementById("dateDisplay").innerText = `Tanggal: ${tgl}/${now.getMonth()+1}/${thn}`;
+
         // Data Produk
         const menuData = {
-            "keren-eka": { name: "Keren", price: 35000, barber: "eka" },
-            "ganteng-eka": { name: "Ganteng", price: 40000, barber: "eka" },
-            "elegan-eka": { name: "Elegan", price: 45000, barber: "eka" },
-            "anak-eka": { name: "Anak", price: 30000, barber: "eka" },
-            "ayahanak-eka": { name: "Ayah & Anak", price: 60000, barber: "eka" },
-            "jenggot-eka": { name: "Jenggot", price: 15000, barber: "eka" },
-            "keren-hudan": { name: "Keren", price: 35000, barber: "hudan" },
-            "ganteng-hudan": { name: "Ganteng", price: 40000, barber: "hudan" },
-            "elegan-hudan": { name: "Elegan", price: 45000, barber: "hudan" },
-            "anak-hudan": { name: "Anak", price: 30000, barber: "hudan" },
-            "ayahanak-hudan": { name: "Ayah & Anak", price: 60000, barber: "hudan" },
-            "jenggot-hudan": { name: "Jenggot", price: 15000, barber: "hudan" }
+            "keren-eka": { name: "Keren", price: 35000, barber: "Eka" },
+            "ganteng-eka": { name: "Ganteng", price: 40000, barber: "Eka" },
+            "elegan-eka": { name: "Elegan", price: 45000, barber: "Eka" },
+            "anak-eka": { name: "Anak", price: 30000, barber: "Eka" },
+            "ayahanak-eka": { name: "Ayah & Anak", price: 60000, barber: "Eka" },
+            "jenggot-eka": { name: "Jenggot", price: 15000, barber: "Eka" },
+            "keren-hudan": { name: "Keren", price: 35000, barber: "Hudan" },
+            "ganteng-hudan": { name: "Ganteng", price: 40000, barber: "Hudan" },
+            "elegan-hudan": { name: "Elegan", price: 45000, barber: "Hudan" },
+            "anak-hudan": { name: "Anak", price: 30000, barber: "Hudan" },
+            "ayahanak-hudan": { name: "Ayah & Anak", price: 60000, barber: "Hudan" },
+            "jenggot-hudan": { name: "Jenggot", price: 15000, barber: "Hudan" }
         };
 
-        let cart = {}; // Menyimpan keranjang: { "keren-eka": 2 }
-        const API_URL = "https://script.google.com/macros/s/AKfycbwSMG25inH2xCj_lO6Bb3Cr6SLdBQJ30pKPWvI0-Lwf6FpHlGjNGQoMhlTj8z7M3zdG/exec"; // Ganti dengan URL deployment Google Apps Script
+        let cart = {}; 
 
-        // Set Tanggal Hari Ini
-        const today = new Date();
-        document.getElementById("dateDisplay").innerText = "Tanggal: " + today.getDate() + "/" + (today.getMonth()+1) + "/" + today.getFullYear();
-
-        // Render Produk ke Grid
+        // Fungsi Render UI Produk
         function renderMenu() {
             const gridEka = document.getElementById("gridEka");
             const gridHudan = document.getElementById("gridHudan");
@@ -147,50 +151,57 @@
                 const card = document.createElement("div");
                 card.className = "item-card";
                 card.onclick = () => addToCart(id);
+                // Format angka misal: 35.000
+                const priceFormatted = item.price.toLocaleString("id-ID").replace(/,/g, '.');
+                
                 card.innerHTML = `
                     <div class="item-name">${item.name}</div>
-                    <div class="item-price">Rp${item.price.toLocaleString("id-ID")}</div>
+                    <div class="item-price">Rp${priceFormatted}</div>
                 `;
-                if (item.barber === "eka") gridEka.appendChild(card);
+                
+                if (item.barber === "Eka") gridEka.appendChild(card);
                 else gridHudan.appendChild(card);
             }
         }
 
+        // Fungsi Keranjang
         function addToCart(id) {
-            if (cart[id]) cart[id]++;
-            else cart[id] = 1;
+            if (cart[id]) cart[id].qty++;
+            else cart[id] = { qty: 1, data: menuData[id] };
             updateCartUI();
         }
 
         function changeQty(id, delta) {
-            cart[id] += delta;
-            if (cart[id] <= 0) delete cart[id];
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) delete cart[id];
             updateCartUI();
         }
 
         function updateCartUI() {
             const container = document.getElementById("cartContainer");
             const totalPriceEl = document.getElementById("totalPrice");
+            const checkoutBtn = document.getElementById("checkoutBtn");
             
             container.innerHTML = "";
             let total = 0;
             let count = 0;
 
-            for (const [id, qty] of Object.entries(cart)) {
+            for (const [id, item] of Object.entries(cart)) {
                 count++;
-                const item = menuData[id];
-                const subtotal = item.price * qty;
+                const subtotal = item.data.price * item.qty;
                 total += subtotal;
+                
+                const priceFmt = item.data.price.toLocaleString("id-ID").replace(/,/g, '.');
 
                 container.innerHTML += `
                     <div class="cart-item">
                         <div class="cart-item-info">
-                            <div class="cart-item-title">${item.name} (${item.barber.toUpperCase()})</div>
-                            <div class="cart-item-price">Rp${item.price.toLocaleString("id-ID")}</div>
+                            <div class="cart-item-title">${item.data.name} (${item.data.barber})</div>
+                            <div class="cart-item-price">Rp${priceFmt}</div>
                         </div>
                         <div class="cart-controls">
                             <button class="btn-qty" onclick="changeQty('${id}', -1)">-</button>
-                            <span class="qty-display">${qty}</span>
+                            <span class="qty-display">${item.qty}</span>
                             <button class="btn-qty" onclick="changeQty('${id}', 1)">+</button>
                         </div>
                     </div>
@@ -199,56 +210,68 @@
 
             if (count === 0) {
                 container.innerHTML = `<div class="cart-empty">Belum ada layanan yang dipilih</div>`;
+                checkoutBtn.disabled = true;
+            } else {
+                checkoutBtn.disabled = false;
             }
 
-            totalPriceEl.innerText = `Rp${total.toLocaleString("id-ID")}`;
-            document.getElementById("checkoutBtn").disabled = count === 0;
+            totalPriceEl.innerText = `Rp${total.toLocaleString("id-ID").replace(/,/g, '.')}`;
         }
 
+        // Fungsi Mengirim Data ke Google Sheets
         async function submitOrder() {
-            if (Object.keys(cart).length === 0) return;
-
             const btn = document.getElementById("checkoutBtn");
             const originalText = btn.innerText;
             btn.innerText = "Menyimpan...";
             btn.disabled = true;
 
-            // Format data persis seperti logika bot WA Anda: "tgl 1"
-            const dataToSave = {
-                tanggal: "tgl " + today.getDate(),
-                tipe: "penjualan",
-                penjualan: cart 
+            // Merakit data untuk sheet
+            let itemsToSave = [];
+            for (let id in cart) {
+                itemsToSave.push({
+                    barber: cart[id].data.barber,
+                    nama: cart[id].data.name,
+                    harga: cart[id].data.price,
+                    qty: cart[id].qty,
+                    subtotal: cart[id].data.price * cart[id].qty
+                });
+            }
+
+            const payload = {
+                tanggal: tgl,
+                bulan: bln,
+                tahun: thn,
+                items: itemsToSave
             };
 
             try {
-                // Di tahap produksi hilangkan komentar fetch ini dan atur API_URL di atas
-                /*
-                await fetch(API_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataToSave)
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
                 });
-                */
 
-                // Simulasi sukses
-                setTimeout(() => {
-                    alert("Berhasil! Penjualan telah dicatat.");
-                    cart = {}; // Kosongkan keranjang
+                const result = await response.json();
+
+                if(result.status === "success") {
+                    alert("✅ Berhasil! Penjualan tersimpan di Sheet.");
+                    cart = {}; 
                     updateCartUI();
-                    btn.innerText = originalText;
-                }, 800);
-
+                } else {
+                    alert("❌ Gagal menyimpan: " + result.message);
+                }
             } catch (error) {
-                alert("Terjadi kesalahan saat menyimpan data.");
+                console.error(error);
+                alert("⚠️ Terjadi kesalahan jaringan, pastikan URL API sudah benar.");
+            } finally {
                 btn.innerText = originalText;
-                btn.disabled = false;
+                btn.disabled = Object.keys(cart).length === 0;
             }
         }
 
-        // Inisialisasi awal
+        // Jalankan saat web dimuat
         renderMenu();
-        updateCartUI();
     </script>
 </body>
 </html>
