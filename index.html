@@ -3,150 +3,590 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS DLARD 2 Barbershop</title>
+    <title>Smart POS - DLARD 2 Barbershop</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (xlsx) untuk Download Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <style>
-        body { background-color: #f8f9fa; }
-        .item-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center; background: white; }
-        .qty-btn { width: 35px; height: 35px; }
-        .qty-input { width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px; margin: 0 10px; }
+        :root {
+            --primary-color: #0f172a;
+            --accent-color: #3b82f6;
+            --bg-body: #f8fafc;
+        }
+        body { background-color: var(--bg-body); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #334155; }
+        
+        /* Navbar */
+        .navbar { background-color: var(--primary-color) !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .navbar-brand { font-weight: 700; letter-spacing: 0.5px; }
+
+        /* Sidebar / Tabs Styling */
+        .nav-pills .nav-link {
+            color: #64748b;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        .nav-pills .nav-link:hover { background-color: #e2e8f0; color: var(--primary-color); }
+        .nav-pills .nav-link.active { background-color: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+
+        /* Card Modern */
+        .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; }
+        .item-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: center; background: white; cursor: pointer; transition: all 0.2s; }
+        .item-card:hover { border-color: var(--accent-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .qty-btn { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; }
+        .qty-input { width: 45px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 8px; font-weight: 600; }
+
+        /* Stat Cards */
+        .stat-card { border-left: 4px solid var(--accent-color); }
+
+        /* Loading Spinner Fullscreen Overlay */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container">
-        <span class="navbar-brand mb-0 h1">💈 POS DLARD 2</span>
+
+<!-- LOADING SPRAY OVERLAY -->
+<div id="loadingOverlay" class="d-none">
+    <div class="spinner-border text-primary mb-2" role="status" style="width: 3rem; height: 3rem;"></div>
+    <h6 class="fw-bold text-dark" id="loadingText">Menghubungkan ke Server...</h6>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark sticky-top">
+    <div class="container-fluid px-4">
+        <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-scissors me-2"></i> SMART POS DLARD 2</span>
+        <button class="btn btn-outline-light btn-sm" onclick="fetchAllData()"><i class="fa-solid fa-rotate me-1"></i> Refresh Data</button>
     </div>
 </nav>
 
-<div class="container">
-    <div id="alertBox" class="alert d-none" role="alert"></div>
-
-    <ul class="nav nav-tabs mb-4" id="posTabs" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#penjualan">Penjualan</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pemasukan">Pemasukan</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pengeluaran">Pengeluaran</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#libur">Libur</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#laporan">Laporan</button></li>
-    </ul>
-
-    <div class="tab-content" id="posTabsContent">
-        <!-- SETUP URL (Isi dengan URL Google Apps Script yang Anda Deploy) -->
-        <div class="alert alert-warning mb-4">
-            Masukkan URL Web App Google Apps Script Anda (akhiran /exec)
-            <input type="text" id="scriptUrl" class="form-control mt-2" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+<div class="container-fluid px-4 py-4">
+    <div class="row">
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="col-lg-3 mb-4">
+            <div class="card p-3 sticky-top" style="top: 80px;">
+                <div class="nav flex-column nav-pills" id="posTabs" role="tablist">
+                    <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#dashboard"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard & Grafik</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#penjualan"><i class="fa-solid fa-cash-register me-2"></i> Kasir Penjualan</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pemasukan"><i class="fa-solid fa-wallet me-2"></i> Pemasukan Tambahan</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pengeluaran"><i class="fa-solid fa-receipt me-2"></i> Pengeluaran / Kasbon</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#libur"><i class="fa-solid fa-calendar-xmark me-2"></i> Jadwal Libur</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#laporan"><i class="fa-solid fa-file-excel me-2"></i> Output / Laporan Excel</button>
+                </div>
+            </div>
         </div>
 
-        <!-- TAB PENJUALAN -->
-        <div class="tab-pane fade show active" id="penjualan">
-            <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglPenjualan" class="form-control"></div>
-            <div class="row" id="menuContainer"></div>
-            <button class="btn btn-primary w-100 mt-3 py-2 fw-bold" onclick="submitPenjualan()">SIMPAN PENJUALAN</button>
-        </div>
+        <!-- MAIN CONTENT CONTAINER -->
+        <div class="col-lg-9">
+            <div class="tab-content" id="posTabsContent">
 
-        <!-- TAB PEMASUKAN -->
-        <div class="tab-pane fade" id="pemasukan">
-            <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglPemasukan" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Keterangan</label><input type="text" id="ketPemasukan" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Nominal (Rp)</label><input type="number" id="nomPemasukan" class="form-control"></div>
-            <button class="btn btn-success w-100 py-2 fw-bold" onclick="submitSingle('input_pemasukan')">SIMPAN PEMASUKAN</button>
-        </div>
+                <!-- 1. TAB DASHBOARD & GRAFIK -->
+                <div class="tab-pane fade show active" id="dashboard">
+                    <div class="card p-4 mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                            <h4 class="fw-bold m-0"><i class="fa-solid fa-chart-line text-primary me-2"></i> Dashboard Analitik</h4>
+                            <!-- Filter Waktu Realtime -->
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="fw-semibold text-muted fs-6">Filter:</label>
+                                <select id="filterMode" class="form-select form-select-sm" onchange="updateDashboardFilterUI()">
+                                    <option value="all">Seluruh Waktu</option>
+                                    <option value="date">Per Tanggal</option>
+                                    <option value="month">Per Bulan</option>
+                                    <option value="year">Per Tahun</option>
+                                </select>
+                                <input type="date" id="inputFilterDate" class="form-control form-control-sm d-none" onchange="renderDashboard()">
+                                <input type="month" id="inputFilterMonth" class="form-control form-control-sm d-none" onchange="renderDashboard()">
+                                <select id="inputFilterYear" class="form-select form-select-sm d-none" onchange="renderDashboard()"></select>
+                            </div>
+                        </div>
 
-        <!-- TAB PENGELUARAN -->
-        <div class="tab-pane fade" id="pengeluaran">
-            <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglPengeluaran" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Keterangan (Contoh: Kasbon)</label><input type="text" id="ketPengeluaran" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Nominal (Rp)</label><input type="number" id="nomPengeluaran" class="form-control"></div>
-            <button class="btn btn-danger w-100 py-2 fw-bold" onclick="submitSingle('input_pengeluaran')">SIMPAN PENGELUARAN</button>
-        </div>
+                        <!-- Stat Cards Grid -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4">
+                                    <span class="text-muted small fw-semibold">Total Penjualan</span>
+                                    <h5 class="fw-bold text-primary mt-1 mb-0" id="statPenjualan">Rp 0</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-success border-4">
+                                    <span class="text-muted small fw-semibold">Pemasukan Lain</span>
+                                    <h5 class="fw-bold text-success mt-1 mb-0" id="statPemasukan">Rp 0</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-danger border-4">
+                                    <span class="text-muted small fw-semibold">Total Pengeluaran</span>
+                                    <h5 class="fw-bold text-danger mt-1 mb-0" id="statPengeluaran">Rp 0</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4">
+                                    <span class="text-muted small fw-semibold">Pendapatan Bersih</span>
+                                    <h5 class="fw-bold text-info mt-1 mb-0" id="statBersih">Rp 0</h5>
+                                </div>
+                            </div>
+                        </div>
 
-        <!-- TAB LIBUR -->
-        <div class="tab-pane fade" id="libur">
-            <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglLibur" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Alasan</label><input type="text" id="alasanLibur" class="form-control"></div>
-            <button class="btn btn-secondary w-100 py-2 fw-bold" onclick="submitLibur()">SIMPAN LIBUR</button>
-        </div>
+                        <!-- Chart Section -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card p-3 bg-white border">
+                                    <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-bar me-1"></i> Grafik Pendapatan & Pengeluaran</h6>
+                                    <div style="position: relative; height:320px;">
+                                        <canvas id="mainChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- TAB LAPORAN -->
-        <div class="tab-pane fade" id="laporan">
-            <button class="btn btn-info w-100 mb-4 text-white py-2 fw-bold" onclick="loadLaporan()">MUAT LAPORAN</button>
-            <div id="laporanLoading" class="text-center d-none">Mengambil data dari Google Sheet...</div>
-            <div id="laporanContent"></div>
+                <!-- 2. TAB KASIR PENJUALAN -->
+                <div class="tab-pane fade" id="penjualan">
+                    <div class="card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold m-0"><i class="fa-solid fa-cash-register text-primary me-2"></i> Input Penjualan Layanan</h4>
+                            <div style="width: 200px;">
+                                <label class="form-label small fw-bold mb-1">Tanggal Transaksi</label>
+                                <input type="date" id="tglPenjualan" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                        <hr class="text-muted">
+                        <div class="row" id="menuContainer"></div>
+                        <button class="btn btn-primary w-100 mt-3 py-3 fw-bold shadow-sm" onclick="confirmPenjualanModal()">
+                            <i class="fa-solid fa-cart-shopping me-2"></i> PROSES TRANSAKSI PENJUALAN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. TAB PEMASUKAN -->
+                <div class="tab-pane fade" id="pemasukan">
+                    <div class="card p-4">
+                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-success me-2"></i> Tambah Pemasukan Lain</h4>
+                        <hr class="text-muted">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tanggal</label>
+                            <input type="date" id="tglPemasukan" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Keterangan</label>
+                            <input type="text" id="ketPemasukan" class="form-control" placeholder="Contoh: Tambahan modal / Tip borongan">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nominal (Rp)</label>
+                            <input type="number" id="nomPemasukan" class="form-control" placeholder="0">
+                        </div>
+                        <button class="btn btn-success w-100 py-3 fw-bold shadow-sm" onclick="submitSingle('input_pemasukan')">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN PEMASUKAN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. TAB PENGELUARAN -->
+                <div class="tab-pane fade" id="pengeluaran">
+                    <div class="card p-4">
+                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-receipt text-danger me-2"></i> Catat Pengeluaran / Kasbon</h4>
+                        <hr class="text-muted">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tanggal</label>
+                            <input type="date" id="tglPengeluaran" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Keterangan</label>
+                            <input type="text" id="ketPengeluaran" class="form-control" placeholder="Contoh: Kasbon / Beli peralatan qris">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nominal (Rp)</label>
+                            <input type="number" id="nomPengeluaran" class="form-control" placeholder="0">
+                        </div>
+                        <button class="btn btn-danger w-100 py-3 fw-bold shadow-sm" onclick="submitSingle('input_pengeluaran')">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN PENGELUARAN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. TAB LIBUR -->
+                <div class="tab-pane fade" id="libur">
+                    <div class="card p-4">
+                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-calendar-xmark text-secondary me-2"></i> Catat Jadwal Libur</h4>
+                        <hr class="text-muted">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tanggal Libur</label>
+                            <input type="date" id="tglLibur" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Alasan Libur</label>
+                            <input type="text" id="alasanLibur" class="form-control" placeholder="Contoh: Keperluan keluarga / Hari Raya">
+                        </div>
+                        <button class="btn btn-secondary w-100 py-3 fw-bold shadow-sm" onclick="submitLibur()">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN JADWAL LIBUR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6. TAB LAPORAN EXCEL -->
+                <div class="tab-pane fade" id="laporan">
+                    <div class="card p-4">
+                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-excel text-success me-2"></i> Output & Download Laporan Excel</h4>
+                        <p class="text-muted">Download rekapitulasi data harian lengkap dengan rincian item layanan, pengeluaran, dan total penghasilan bersih persis seperti format template Excel standar Anda.</p>
+                        <hr class="text-muted">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold">Pilih Bulan Rekap</label>
+                                <input type="month" id="excelMonth" class="form-control">
+                            </div>
+                            <div class="col-md-7">
+                                <button class="btn btn-success w-100 py-2 fw-bold shadow-sm" onclick="downloadExcelReport()">
+                                    <i class="fa-solid fa-file-arrow-down me-2"></i> DOWNLOAD EXCEL REKAP BULANAN
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.querySelectorAll('input[type="date"]').forEach(el => el.valueAsDate = new Date());
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="toastMessage">Pesan Notifikasi</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 
+<!-- MODAL KONFIRMASI CHECKOUT PENJUALAN -->
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-cart-shopping me-2"></i> Konfirmasi Pesanan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-2">Item layanan yang akan disimpan:</p>
+                <div id="checkoutSummaryList" class="border rounded p-3 bg-light mb-3" style="max-height: 200px; overflow-y: auto;"></div>
+                <h5 class="fw-bold text-end text-primary" id="checkoutTotalModal">Total: Rp 0</h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="executeSubmitPenjualan()">Ya, Simpan Transaksi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // URL API Permanen sesuai permintaan
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydD0IS2l0qAhUiiyz5lD-9DgXMIi6C6y0UzvMpoDkmAsSSHZkx8-Ux49E3y1gisrewNA/exec";
+
+    // Data Menu & Harga
     const MENU = {
         "keren-eka": 35000, "ganteng-eka": 40000, "elegan-eka": 45000, "anak-eka": 30000, "ayahanak-eka": 60000, "jenggot-eka": 15000,
         "keren-hudan": 35000, "ganteng-hudan": 40000, "elegan-hudan": 45000, "anak-hudan": 30000, "ayahanak-hudan": 60000, "jenggot-hudan": 15000
     };
 
-    const menuContainer = document.getElementById('menuContainer');
-    Object.keys(MENU).forEach(item => {
-        const col = document.createElement('div');
-        col.className = 'col-6 col-md-4';
-        col.innerHTML = `
-            <div class="item-card">
-                <h6 class="text-capitalize">${item.replace('-', ' ')}</h6>
-                <p class="text-muted mb-2">Rp ${MENU[item].toLocaleString('id-ID')}</p>
-                <div class="d-flex justify-content-center align-items-center">
-                    <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', -1)">-</button>
-                    <input type="number" id="qty-${item}" class="qty-input" value="0" min="0" readonly>
-                    <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', 1)">+</button>
-                </div>
-            </div>`;
-        menuContainer.appendChild(col);
+    let globalData = { penjualan: [], pemasukan: [], pengeluaran: [], libur: [] };
+    let mainChartInstance = null;
+
+    // Inisialisasi awal saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
+        document.getElementById('excelMonth').value = today.slice(0, 7);
+
+        initMenuCards();
+        populateYearDropdown();
+        fetchAllData();
     });
+
+    function showLoading(show, text = "Memproses...") {
+        const overlay = document.getElementById('loadingOverlay');
+        document.getElementById('loadingText').innerText = text;
+        if(show) overlay.classList.remove('d-none');
+        else overlay.classList.add('d-none');
+    }
+
+    function showToast(msg, type = "success") {
+        const toastEl = document.getElementById('liveToast');
+        const toastBody = document.getElementById('toastMessage');
+        toastBody.innerText = msg;
+        toastEl.className = `toast align-items-center text-white border-0 bg-${type === 'success' ? 'success' : (type === 'warning' ? 'warning' : 'danger')}`;
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
+    function initMenuCards() {
+        const menuContainer = document.getElementById('menuContainer');
+        menuContainer.innerHTML = '';
+        Object.keys(MENU).forEach(item => {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4';
+            col.innerHTML = `
+                <div class="item-card" onclick="incrementQty('${item}')">
+                    <h6 class="text-capitalize fw-bold text-dark mb-1">${item.replace('-', ' ')}</h6>
+                    <p class="text-muted small mb-2">Rp ${MENU[item].toLocaleString('id-ID')}</p>
+                    <div class="d-flex justify-content-center align-items-center" onclick="event.stopPropagation()">
+                        <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', -1)">-</button>
+                        <input type="number" id="qty-${item}" class="qty-input" value="0" min="0" readonly>
+                        <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', 1)">+</button>
+                    </div>
+                </div>`;
+            menuContainer.appendChild(col);
+        });
+    }
 
     function ubahQty(item, delta) {
         const input = document.getElementById(`qty-${item}`);
         input.value = Math.max(0, parseInt(input.value) + delta);
     }
 
-    function showAlert(msg, type="success") {
-        const box = document.getElementById('alertBox');
-        box.className = `alert alert-${type} mt-3`;
-        box.innerText = msg;
-        box.classList.remove('d-none');
-        setTimeout(() => box.classList.add('d-none'), 4000);
-        window.scrollTo(0,0);
+    function incrementQty(item) {
+        ubahQty(item, 1);
     }
 
-    function getUrl() {
-        const url = document.getElementById('scriptUrl').value.trim();
-        if(!url) { showAlert("Penting: Masukkan URL Google Script Anda terlebih dahulu!", "danger"); return null; }
-        return url;
+    function populateYearDropdown() {
+        const yearSelect = document.getElementById('inputFilterYear');
+        const currentYear = new Date().getFullYear();
+        yearSelect.innerHTML = '';
+        for(let y = currentYear; y >= currentYear - 3; y--) {
+            let opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+        }
     }
 
-    async function sendData(payload) {
-        const url = getUrl(); if(!url) return;
+    // Ambil Data dari Backend Apps Script (GET)
+    async function fetchAllData() {
+        showLoading(true, "Mengambil data dari Google Sheet...");
         try {
-            // Menggunakan header text/plain untuk melewati restriksi CORS preflight Google Apps Script
-            const res = await fetch(url, {
+            const res = await fetch(SCRIPT_URL);
+            const result = await res.json();
+            if(result.status === "success") {
+                globalData = result.data;
+                renderDashboard();
+                showToast("Data berhasil diperbarui!", "success");
+            } else {
+                showToast("Gagal memuat data: " + result.message, "danger");
+            }
+        } catch(err) {
+            showToast("Koneksi gagal! Periksa jaringan internet.", "danger");
+        }
+        showLoading(false);
+    }
+
+    // Kirim Data ke Backend (POST)
+    async function sendData(payload) {
+        showLoading(true, "Menyimpan data...");
+        try {
+            const res = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
             if(data.status === 'success') {
-                showAlert(data.message, "success");
-                document.querySelectorAll('input[type="number"], input[type="text"]:not(#scriptUrl)').forEach(el => el.value = el.id.startsWith('qty') ? 0 : '');
+                showToast(data.message, "success");
+                // Reset input forms
+                document.querySelectorAll('input[type="number"], input[type="text"]:not([readonly])').forEach(el => el.value = '');
+                Object.keys(MENU).forEach(item => {
+                    const qInput = document.getElementById(`qty-${item}`);
+                    if(qInput) qInput.value = 0;
+                });
+                fetchAllData();
+            } else {
+                showToast("Gagal: " + data.message, "danger");
             }
-        } catch (err) { showAlert("Koneksi gagal. Periksa URL Web App atau Jaringan Internet.", "danger"); }
+        } catch (err) {
+            showToast("Gagal terhubung ke server backend.", "danger");
+        }
+        showLoading(false);
     }
 
-    function submitPenjualan() {
+    // Dashboard Filter Handler
+    function updateDashboardFilterUI() {
+        const mode = document.getElementById('filterMode').value;
+        document.getElementById('inputFilterDate').classList.add('d-none');
+        document.getElementById('inputFilterMonth').classList.add('d-none');
+        document.getElementById('inputFilterYear').classList.add('d-none');
+
+        if(mode === 'date') document.getElementById('inputFilterDate').classList.remove('d-none');
+        if(mode === 'month') document.getElementById('inputFilterMonth').classList.remove('d-none');
+        if(mode === 'year') document.getElementById('inputFilterYear').classList.remove('d-none');
+
+        renderDashboard();
+    }
+
+    function renderDashboard() {
+        const mode = document.getElementById('filterMode').value;
+        const filterDate = document.getElementById('inputFilterDate').value;
+        const filterMonth = document.getElementById('inputFilterMonth').value;
+        const filterYear = document.getElementById('inputFilterYear').value;
+
+        // Filter data berdasarkan kriteria
+        let filteredPenjualan = globalData.penjualan.filter(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if(mode === 'date') return tgl === filterDate;
+            if(mode === 'month') return tgl.startsWith(filterMonth);
+            if(mode === 'year') return tgl.startsWith(filterYear);
+            return true;
+        });
+
+        let filteredPemasukan = globalData.pemasukan.filter(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if(mode === 'date') return tgl === filterDate;
+            if(mode === 'month') return tgl.startsWith(filterMonth);
+            if(mode === 'year') return tgl.startsWith(filterYear);
+            return true;
+        });
+
+        let filteredPengeluaran = globalData.pengeluaran.filter(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if(mode === 'date') return tgl === filterDate;
+            if(mode === 'month') return tgl.startsWith(filterMonth);
+            if(mode === 'year') return tgl.startsWith(filterYear);
+            return true;
+        });
+
+        let totPenjualan = filteredPenjualan.reduce((sum, r) => sum + Number(r.subtotal || 0), 0);
+        let totPemasukan = filteredPemasukan.reduce((sum, r) => sum + Number(r.nominal || 0), 0);
+        let totPengeluaran = filteredPengeluaran.reduce((sum, r) => sum + Number(r.nominal || 0), 0);
+        let bersih = (totPenjualan + totPemasukan) - totPengeluaran;
+
+        document.getElementById('statPenjualan').innerText = `Rp ${totPenjualan.toLocaleString('id-ID')}`;
+        document.getElementById('statPemasukan').innerText = `Rp ${totPemasukan.toLocaleString('id-ID')}`;
+        document.getElementById('statPengeluaran').innerText = `Rp ${totPengeluaran.toLocaleString('id-ID')}`;
+        document.getElementById('statBersih').innerText = `Rp ${bersih.toLocaleString('id-ID')}`;
+
+        renderChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran, mode);
+    }
+
+    function renderChart(penjualan, pemasukan, pengeluaran, mode) {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        
+        // Agregasi data per tanggal untuk grafik
+        let dateMap = {};
+        
+        penjualan.forEach(r => {
+            let tgl = String(r.tanggal || '').split('T')[0];
+            if(!dateMap[tgl]) dateMap[tgl] = { pen: 0, pem: 0, peng: 0 };
+            dateMap[tgl].pen += Number(r.subtotal || 0);
+        });
+
+        pemasukan.forEach(r => {
+            let tgl = String(r.tanggal || '').split('T')[0];
+            if(!dateMap[tgl]) dateMap[tgl] = { pen: 0, pem: 0, peng: 0 };
+            dateMap[tgl].pem += Number(r.nominal || 0);
+        });
+
+        pengeluaran.forEach(r => {
+            let tgl = String(r.tanggal || '').split('T')[0];
+            if(!dateMap[tgl]) dateMap[tgl] = { pen: 0, pem: 0, peng: 0 };
+            dateMap[tgl].peng += Number(r.nominal || 0);
+        });
+
+        let sortedDates = Object.keys(dateMap).sort();
+        let labels = sortedDates.map(d => d);
+        let dataPenjualan = sortedDates.map(d => dateMap[d].pen + dateMap[d].pem);
+        let dataPengeluaran = sortedDates.map(d => dateMap[d].peng);
+
+        if(mainChartInstance) mainChartInstance.destroy();
+
+        mainChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels.length > 0 ? labels : ['Belum ada data'],
+                datasets: [
+                    {
+                        label: 'Total Pemasukan (Penjualan+Lain)',
+                        data: dataPenjualan.length > 0 ? dataPenjualan : [0],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Total Pengeluaran',
+                        data: dataPengeluaran.length > 0 ? dataPengeluaran : [0],
+                        backgroundColor: '#ef4444',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Modal Konfirmasi Penjualan
+    function confirmPenjualanModal() {
+        const items = [];
+        Object.keys(MENU).forEach(item => {
+            const qty = parseInt(document.getElementById(`qty-${item}`).value);
+            if(qty > 0) items.push({ nama: item, qty: qty, subtotal: qty * MENU[item] });
+        });
+
+        if(items.length === 0) {
+            showToast("Belum ada qty item layanan yang diisi!", "warning");
+            return;
+        }
+
+        let summaryHtml = '';
+        let total = 0;
+        items.forEach(i => {
+            total += i.subtotal;
+            summaryHtml += `<div class="d-flex justify-content-between mb-1"><span>${i.nama.replace('-', ' ')} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
+        });
+
+        document.getElementById('checkoutSummaryList').innerHTML = summaryHtml;
+        document.getElementById('checkoutTotalModal').innerText = `Total: Rp ${total.toLocaleString('id-ID')}`;
+
+        const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+        modal.show();
+    }
+
+    function executeSubmitPenjualan() {
+        const bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+        bootstrapModal.hide();
+
         const items = [];
         Object.keys(MENU).forEach(item => {
             const qty = parseInt(document.getElementById(`qty-${item}`).value);
             if(qty > 0) items.push({ nama: item, qty: qty });
         });
-        if(items.length === 0) return showAlert("Belum ada qty yang diisi!", "warning");
-        sendData({ action: "input_penjualan", tanggal: document.getElementById('tglPenjualan').value, items: items });
+
+        sendData({
+            action: "input_penjualan",
+            tanggal: document.getElementById('tglPenjualan').value,
+            items: items
+        });
     }
 
     function submitSingle(action) {
@@ -154,40 +594,95 @@
         let tgl = document.getElementById(`tgl${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
         let ket = document.getElementById(`ket${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
         let nom = document.getElementById(`nom${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
-        if(!ket || !nom) return showAlert("Isi keterangan dan nominal uang!", "warning");
+
+        if(!ket || !nom) {
+            showToast("Harap isi keterangan dan nominal uang dengan lengkap!", "warning");
+            return;
+        }
+
         sendData({ action: action, tanggal: tgl, keterangan: ket, nominal: parseInt(nom) });
     }
 
     function submitLibur() {
         let tgl = document.getElementById('tglLibur').value;
         let alasan = document.getElementById('alasanLibur').value;
-        if(!alasan) return showAlert("Isi alasan libur!", "warning");
+        if(!alasan) {
+            showToast("Harap isi alasan libur terlebih dahulu!", "warning");
+            return;
+        }
         sendData({ action: "input_libur", tanggal: tgl, alasan: alasan });
     }
 
-    async function loadLaporan() {
-        const url = getUrl(); if(!url) return;
-        document.getElementById('laporanLoading').classList.remove('d-none');
-        document.getElementById('laporanContent').innerHTML = '';
-        try {
-            const res = await fetch(url);
-            const result = await res.json();
-            if(result.status === "success") {
-                let totPenjualan = 0; result.data.penjualan.forEach(r => totPenjualan += parseInt(r.subtotal || 0));
-                let totPemasukan = 0; result.data.pemasukan.forEach(r => totPemasukan += parseInt(r.nominal || 0));
-                let totPengeluaran = 0; result.data.pengeluaran.forEach(r => totPengeluaran += parseInt(r.nominal || 0));
-                let bersih = totPenjualan + totPemasukan - totPengeluaran;
+    // Fitur Download Laporan Excel (Format sesuai Screenshot)
+    function downloadExcelReport() {
+        const monthVal = document.getElementById('excelMonth').value; // format "YYYY-MM"
+        if(!monthVal) {
+            showToast("Pilih bulan rekap terlebih dahulu!", "warning");
+            return;
+        }
 
-                document.getElementById('laporanContent').innerHTML = `
-                    <div class="row text-center mb-4">
-                        <div class="col-12 col-md-6 mb-3"><div class="card bg-primary text-white"><div class="card-body"><h5>Total Penjualan</h5><p class="fs-5">Rp ${totPenjualan.toLocaleString('id-ID')}</p></div></div></div>
-                        <div class="col-12 col-md-6 mb-3"><div class="card bg-success text-white"><div class="card-body"><h5>Pemasukan</h5><p class="fs-5">Rp ${totPemasukan.toLocaleString('id-ID')}</p></div></div></div>
-                        <div class="col-12 col-md-6 mb-3"><div class="card bg-danger text-white"><div class="card-body"><h5>Total Pengeluaran</h5><p class="fs-5">Rp ${totPengeluaran.toLocaleString('id-ID')}</p></div></div></div>
-                        <div class="col-12 col-md-6 mb-3"><div class="card bg-info text-white"><div class="card-body"><h5>Penghasilan Bersih</h5><p class="fs-4 fw-bold">Rp ${bersih.toLocaleString('id-ID')}</p></div></div></div>
-                    </div>`;
-            }
-        } catch(e) { showAlert("Gagal mengambil data dari server.", "danger"); }
-        document.getElementById('laporanLoading').classList.add('d-none');
+        let [year, month] = monthVal.split('-');
+        let daysInMonth = new Date(year, month, 0).getDate();
+
+        let excelRows = [
+            ["Tanggal", "Tipe", "Item", "Jumlah", "Harga", "Subtotal"]
+        ];
+
+        // Loop per tanggal dalam bulan tersebut (misal tgl 1 s/d tgl 31)
+        for(let d = 1; d <= daysInMonth; d++) {
+            let dayStr = String(d).padStart(2, '0');
+            let dateFormatted = `${year}-${month}-${dayStr}`;
+            let tglLabel = `tgl ${d}`;
+
+            // Cari penjualan pada tanggal ini
+            let dayPenjualan = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === dateFormatted);
+            let dayPemasukan = globalData.pemasukan.filter(r => String(r.tanggal || '').split('T')[0] === dateFormatted);
+            let dayPengeluaran = globalData.pengeluaran.filter(r => String(r.tanggal || '').split('T')[0] === dateFormatted);
+
+            let totalPenjualanHariIni = 0;
+
+            // Masukkan seluruh item menu standar ke baris harian (mengikuti template screenshot)
+            Object.keys(MENU).forEach(menuName => {
+                let found = dayPenjualan.find(r => String(r.item).toLowerCase() === menuName.toLowerCase());
+                let qty = found ? Number(found.qty || 0) : 0;
+                let harga = MENU[menuName];
+                let subtotal = qty * harga;
+                totalPenjualanHariIni += subtotal;
+
+                excelRows.push([tglLabel, "Penjualan", menuName, qty, harga, subtotal]);
+            });
+
+            // Masukkan pemasukan tambahan jika ada
+            let totalPemasukanHariIni = 0;
+            dayPemasukan.forEach(p => {
+                let nom = Number(p.nominal || 0);
+                totalPemasukanHariIni += nom;
+                excelRows.push([tglLabel, "Pemasukan", p.keterangan, "", "", nom]);
+            });
+
+            // Masukkan pengeluaran
+            let totalPengeluaranHariIni = 0;
+            dayPengeluaran.forEach(p => {
+                let nom = Number(p.nominal || 0);
+                totalPengeluaranHariIni += nom;
+                excelRows.push([tglLabel, "Pengeluaran", p.keterangan, "", "", nom]);
+            });
+
+            // Hitung total bersih hari itu
+            let bersihHariIni = (totalPenjualanHariIni + totalPemasukanHariIni) - totalPengeluaranHariIni;
+
+            // Baris Total Penghasilan Bersih Hari Ini (persis seperti screenshot)
+            excelRows.push([tglLabel, "", "Total Penghasilan Bersih Hari Ini", "", "", bersihHariIni]);
+        }
+
+        // Buat Workbook Excel via SheetJS
+        const worksheet = XLSX.utils.aoa_to_sheet(excelRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Penjualan");
+
+        // Download file
+        XLSX.writeFile(workbook, `rekap_penjualan_${year}_${month}.xlsx`);
+        showToast("Laporan Excel berhasil di-download!", "success");
     }
 </script>
 </body>
