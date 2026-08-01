@@ -19,6 +19,14 @@
         }
         body { background-color: var(--bg-body); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #334155; }
         
+        /* Utility anti block text (disable selection) */
+        .user-select-none {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
         /* Navbar */
         .navbar { background-color: var(--primary-color) !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .navbar-brand { font-weight: 700; letter-spacing: 0.5px; }
@@ -37,7 +45,7 @@
 
         /* Card Modern */
         .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; }
-        .item-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: center; background: white; cursor: pointer; transition: all 0.2s; }
+        .item-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center; background: white; cursor: pointer; transition: all 0.2s; }
         .item-card:hover { border-color: var(--accent-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
         .qty-btn { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; }
@@ -66,7 +74,7 @@
 <nav class="navbar navbar-dark sticky-top">
     <div class="container-fluid px-4">
         <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-scissors me-2"></i> SMART POS DLARD 2</span>
-        <button class="btn btn-outline-light btn-sm" onclick="fetchAllData()"><i class="fa-solid fa-rotate me-1"></i> Refresh Data</button>
+        <button class="btn btn-outline-light btn-sm fw-bold" onclick="fetchAllData()"><i class="fa-solid fa-rotate me-1"></i> Refresh Data</button>
     </div>
 </nav>
 
@@ -77,10 +85,12 @@
             <div class="card p-3 sticky-top" style="top: 80px;">
                 <div class="nav flex-column nav-pills" id="posTabs" role="tablist">
                     <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#dashboard"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard & Grafik</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#analisis_produk"><i class="fa-solid fa-chart-simple me-2"></i> Analisis Produk</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#penjualan"><i class="fa-solid fa-cash-register me-2"></i> Kasir Penjualan</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pemasukan"><i class="fa-solid fa-wallet me-2"></i> Pemasukan Tambahan</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pengeluaran"><i class="fa-solid fa-receipt me-2"></i> Pengeluaran / Kasbon</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#libur"><i class="fa-solid fa-calendar-xmark me-2"></i> Jadwal Libur</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#history"><i class="fa-solid fa-clock-rotate-left me-2"></i> History & Hapus Data</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#laporan"><i class="fa-solid fa-file-excel me-2"></i> Output / Laporan Excel</button>
                 </div>
             </div>
@@ -95,7 +105,6 @@
                     <div class="card p-4 mb-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                             <h4 class="fw-bold m-0"><i class="fa-solid fa-chart-line text-primary me-2"></i> Dashboard Analitik</h4>
-                            <!-- Filter Waktu Realtime -->
                             <div class="d-flex align-items-center gap-2">
                                 <label class="fw-semibold text-muted fs-6">Filter:</label>
                                 <select id="filterMode" class="form-select form-select-sm" onchange="updateDashboardFilterUI()">
@@ -138,11 +147,10 @@
                             </div>
                         </div>
 
-                        <!-- Chart Section -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="card p-3 bg-white border">
-                                    <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-bar me-1"></i> Grafik Pendapatan & Pengeluaran (Naik / Turun)</h6>
+                                    <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-bar me-1"></i> Grafik Pendapatan & Pengeluaran</h6>
                                     <div style="position: relative; height:320px;">
                                         <canvas id="mainChart"></canvas>
                                     </div>
@@ -152,20 +160,47 @@
                     </div>
                 </div>
 
+                <!-- 1.B. TAB ANALISIS PRODUK (MENU BARU) -->
+                <div class="tab-pane fade" id="analisis_produk">
+                    <div class="card p-4">
+                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-chart-simple text-primary me-2"></i> Analisis Penjualan Layanan</h4>
+                        <p class="text-muted small mb-4">Grafik total perbandingan kuantitas layanan yang di-checkout dari waktu ke waktu berdasarkan data ter-update.</p>
+                        
+                        <div class="card p-3 bg-white border shadow-sm">
+                            <div style="position: relative; height:400px;">
+                                <canvas id="productChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 2. TAB KASIR PENJUALAN -->
                 <div class="tab-pane fade" id="penjualan">
                     <div class="card p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="fw-bold m-0"><i class="fa-solid fa-cash-register text-primary me-2"></i> Input Penjualan Layanan</h4>
+                            <h4 class="fw-bold m-0"><i class="fa-solid fa-cash-register text-primary me-2"></i> Input Penjualan</h4>
                             <div style="width: 200px;">
                                 <label class="form-label small fw-bold mb-1">Tanggal Transaksi</label>
                                 <input type="date" id="tglPenjualan" class="form-control form-control-sm">
                             </div>
                         </div>
-                        <hr class="text-muted">
-                        <div class="row" id="menuContainer"></div>
-                        <button class="btn btn-primary w-100 mt-3 py-3 fw-bold shadow-sm" onclick="confirmPenjualanModal()">
-                            <i class="fa-solid fa-cart-shopping me-2"></i> PROSES TRANSAKSI PENJUALAN
+                        <hr class="text-muted mb-4">
+
+                        <!-- Border dan Pemisah Eka / Hudan (Beserta anti text block) -->
+                        <div class="user-select-none">
+                            <div class="p-3 border border-primary border-2 rounded mb-4" style="background-color: #f0f7ff;">
+                                <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-user me-2"></i> Layanan Eka</h5>
+                                <div class="row g-3" id="menuContainerEka"></div>
+                            </div>
+                            
+                            <div class="p-3 border border-info border-2 rounded mb-4" style="background-color: #f0fbff;">
+                                <h5 class="fw-bold text-info mb-3"><i class="fa-solid fa-user me-2"></i> Layanan Hudan</h5>
+                                <div class="row g-3" id="menuContainerHudan"></div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm fs-5" onclick="confirmPenjualanModal()">
+                            <i class="fa-solid fa-cart-shopping me-2"></i> PROSES TRANSAKSI
                         </button>
                     </div>
                 </div>
@@ -235,6 +270,18 @@
                     </div>
                 </div>
 
+                <!-- 5.B TAB HISTORY DAN DELETE (MENU BARU) -->
+                <div class="tab-pane fade" id="history">
+                    <div class="card p-4">
+                        <h4 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> History & Manajemen Data</h4>
+                        <p class="text-muted small">Kelola riwayat input data (Penjualan, Pemasukan, Pengeluaran, Libur) per tanggal. Tekan tombol Hapus untuk mereset seluruh transaksi di tanggal tersebut dari server.</p>
+                        <hr class="text-muted mb-4">
+                        
+                        <!-- Tempat Render History Dinamis -->
+                        <div id="historyContainer"></div>
+                    </div>
+                </div>
+
                 <!-- 6. TAB LAPORAN EXCEL -->
                 <div class="tab-pane fade" id="laporan">
                     <div class="card p-4">
@@ -284,7 +331,7 @@
                 <h5 class="fw-bold text-end text-primary" id="checkoutTotalModal">Total: Rp 0</h5>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
                 <button type="button" class="btn btn-primary px-4 fw-bold" onclick="executeSubmitPenjualan()">Ya, Simpan Transaksi</button>
             </div>
         </div>
@@ -304,8 +351,14 @@
         "keren-hudan": 35000, "ganteng-hudan": 40000, "elegan-hudan": 45000, "anak-hudan": 30000, "ayahanak-hudan": 60000, "jenggot-hudan": 15000
     };
 
+    const URUTAN_MENU = [
+        "keren-eka", "ganteng-eka", "elegan-eka", "anak-eka", "ayahanak-eka", "jenggot-eka", 
+        "keren-hudan", "ganteng-hudan", "elegan-hudan", "anak-hudan", "ayahanak-hudan", "jenggot-hudan"
+    ];
+
     let globalData = { penjualan: [], pemasukan: [], pengeluaran: [], libur: [] };
     let mainChartInstance = null;
+    let productChartInstance = null;
 
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date().toISOString().split('T')[0];
@@ -333,14 +386,19 @@
         toast.show();
     }
 
+    // Memisahkan render EKA dan HUDAN
     function initMenuCards() {
-        const menuContainer = document.getElementById('menuContainer');
-        menuContainer.innerHTML = '';
+        const containerEka = document.getElementById('menuContainerEka');
+        const containerHudan = document.getElementById('menuContainerHudan');
+        
+        containerEka.innerHTML = '';
+        containerHudan.innerHTML = '';
+
         Object.keys(MENU).forEach(item => {
             const col = document.createElement('div');
             col.className = 'col-6 col-md-4';
             col.innerHTML = `
-                <div class="item-card" onclick="incrementQty('${item}')">
+                <div class="item-card shadow-sm" onclick="incrementQty('${item}')">
                     <h6 class="text-capitalize fw-bold text-dark mb-1">${item.replace('-', ' ')}</h6>
                     <p class="text-muted small mb-2">Rp ${MENU[item].toLocaleString('id-ID')}</p>
                     <div class="d-flex justify-content-center align-items-center" onclick="event.stopPropagation()">
@@ -349,7 +407,12 @@
                         <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', 1)">+</button>
                     </div>
                 </div>`;
-            menuContainer.appendChild(col);
+            
+            if (item.includes('eka')) {
+                containerEka.appendChild(col);
+            } else if (item.includes('hudan')) {
+                containerHudan.appendChild(col);
+            }
         });
     }
 
@@ -376,13 +439,15 @@
 
     // Ambil Data dari Backend
     async function fetchAllData() {
-        showLoading(true, "Mengambil data dari Google Sheet...");
+        showLoading(true, "Mengambil data dari Server...");
         try {
             const res = await fetch(SCRIPT_URL);
             const result = await res.json();
             if(result.status === "success") {
                 globalData = result.data;
                 renderDashboard();
+                renderProductChart();
+                renderHistory();
                 showToast("Data berhasil diperbarui!", "success");
             } else {
                 showToast("Gagal memuat data: " + result.message, "danger");
@@ -395,7 +460,7 @@
 
     // Kirim Data ke Backend (POST)
     async function sendData(payload) {
-        showLoading(true, payload.action === 'generate_rekap' ? "Menyusun Rekap Data (memakan waktu beberapa detik)..." : "Menyimpan data...");
+        showLoading(true, payload.action === 'generate_rekap' ? "Menyusun Excel (Bisa Beberapa Detik)..." : "Memproses Data...");
         try {
             const res = await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -407,17 +472,15 @@
             if(data.status === 'success') {
                 showToast(data.message, "success");
                 
-                // Khusus jika actionnya adalah download/generate report
                 if(payload.action === 'generate_rekap' && data.url) {
-                    window.location.href = data.url; // Otomatis trigger file Excel
+                    window.location.href = data.url; 
                 } else {
-                    // Reset input forms
                     document.querySelectorAll('input[type="number"], input[type="text"]:not([readonly])').forEach(el => el.value = '');
                     Object.keys(MENU).forEach(item => {
                         const qInput = document.getElementById(`qty-${item}`);
                         if(qInput) qInput.value = 0;
                     });
-                    fetchAllData();
+                    fetchAllData(); // Refresh Data UI
                 }
             } else {
                 showToast("Gagal: " + data.message, "danger");
@@ -428,7 +491,78 @@
         showLoading(false);
     }
 
-    // Dashboard Filter Handler
+    // ==========================================
+    // RENDER FUNGSI: HISTORY DATA & DELETE
+    // ==========================================
+    function renderHistory() {
+        const historyContainer = document.getElementById('historyContainer');
+        historyContainer.innerHTML = '';
+
+        let datesMap = {};
+
+        const addDataToMap = (dataArray, type) => {
+            dataArray.forEach(row => {
+                let tgl = String(row.tanggal || '').split('T')[0];
+                if (!tgl) return;
+                if (!datesMap[tgl]) datesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0 };
+                datesMap[tgl][type]++;
+            });
+        };
+
+        addDataToMap(globalData.penjualan, 'penjualan');
+        addDataToMap(globalData.pemasukan, 'pemasukan');
+        addDataToMap(globalData.pengeluaran, 'pengeluaran');
+        
+        // Include Libur dates
+        globalData.libur.forEach(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if (!tgl) return;
+            if (!datesMap[tgl]) datesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0 };
+        });
+
+        // Sort descending (dari terbaru)
+        let sortedDates = Object.keys(datesMap).sort((a, b) => b.localeCompare(a));
+
+        if (sortedDates.length === 0) {
+            historyContainer.innerHTML = '<div class="alert alert-secondary border-0"><i class="fa-solid fa-circle-info me-2"></i>Belum ada data transaksi yang tersimpan.</div>';
+            return;
+        }
+
+        sortedDates.forEach(date => {
+            let p = datesMap[date].penjualan;
+            let m = datesMap[date].pemasukan;
+            let k = datesMap[date].pengeluaran;
+            
+            let cardHTML = `
+                <div class="card mb-3 border-secondary shadow-sm">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-calendar-day me-2 text-primary"></i> Tanggal: ${date}</h6>
+                        <button class="btn btn-sm btn-outline-danger fw-bold shadow-sm" onclick="deleteDataByDate('${date}')">
+                            <i class="fa-solid fa-trash me-1"></i> Hapus Tanggal Ini
+                        </button>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row text-center small fw-semibold">
+                            <div class="col-4 border-end">Penjualan:<br><span class="text-primary fs-6">${p} Item</span></div>
+                            <div class="col-4 border-end">Pemasukan Lain:<br><span class="text-success fs-6">${m} Catatan</span></div>
+                            <div class="col-4">Pengeluaran:<br><span class="text-danger fs-6">${k} Catatan</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            historyContainer.innerHTML += cardHTML;
+        });
+    }
+
+    function deleteDataByDate(dateString) {
+        if (confirm(`Peringatan PENTING!\n\nApakah Anda yakin ingin MENGHAPUS SEMUA DATA transaksi (penjualan, pemasukan, pengeluaran, libur) pada tanggal ${dateString} ?\n\nTindakan ini tidak dapat dibatalkan.`)) {
+            sendData({ action: "delete_by_date", tanggal: dateString });
+        }
+    }
+
+    // ==========================================
+    // RENDER FUNGSI: DASHBOARD & FILTER CHART
+    // ==========================================
     function updateDashboardFilterUI() {
         const mode = document.getElementById('filterMode').value;
         document.getElementById('inputFilterDate').classList.add('d-none');
@@ -448,7 +582,6 @@
         const filterMonth = document.getElementById('inputFilterMonth').value;
         const filterYear = document.getElementById('inputFilterYear').value;
 
-        // Filter data berdasarkan kriteria
         let filteredPenjualan = globalData.penjualan.filter(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if(mode === 'date') return tgl === filterDate;
@@ -483,13 +616,11 @@
         document.getElementById('statPengeluaran').innerText = `Rp ${totPengeluaran.toLocaleString('id-ID')}`;
         document.getElementById('statBersih').innerText = `Rp ${bersih.toLocaleString('id-ID')}`;
 
-        renderChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran);
+        renderMainChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran);
     }
 
-    // CHART.JS MODERN DENGAN GRAFIK NAIK / TURUN
-    function renderChart(penjualan, pemasukan, pengeluaran) {
+    function renderMainChart(penjualan, pemasukan, pengeluaran) {
         const ctx = document.getElementById('mainChart').getContext('2d');
-        
         let dateMap = {};
         
         penjualan.forEach(r => {
@@ -512,81 +643,89 @@
         let labels = sortedDates.map(d => d);
         let dataPemasukanTotal = sortedDates.map(d => dateMap[d].pen + dateMap[d].pem);
         let dataPengeluaran = sortedDates.map(d => dateMap[d].peng);
-        
-        // Kalkulasi Garis Pendapatan Bersih (Naik / Turun)
         let dataBersih = sortedDates.map(d => (dateMap[d].pen + dateMap[d].pem) - dateMap[d].peng);
 
         if(mainChartInstance) mainChartInstance.destroy();
 
-        // Menggunakan Combination Chart (Line & Bar)
         mainChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels.length > 0 ? labels : ['Belum ada data'],
                 datasets: [
                     {
-                        type: 'line',
-                        label: 'Pendapatan Bersih (Naik/Turun)',
-                        data: dataBersih.length > 0 ? dataBersih : [0],
-                        borderColor: '#10b981', // Hijau terang modern
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#10b981',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        tension: 0.3, // Curve halus (Smooth)
-                        fill: true,
-                        order: 1 // Garis di atas bar
+                        type: 'line', label: 'Pendapatan Bersih (Naik/Turun)', data: dataBersih.length > 0 ? dataBersih : [0],
+                        borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3,
+                        pointBackgroundColor: '#fff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 4, tension: 0.3, fill: true, order: 1
                     },
                     {
-                        type: 'bar',
-                        label: 'Total Kotor (Penjualan+Lain)',
-                        data: dataPemasukanTotal.length > 0 ? dataPemasukanTotal : [0],
-                        backgroundColor: '#3b82f6', // Biru
-                        borderRadius: 4,
-                        order: 2
+                        type: 'bar', label: 'Total Kotor (Penjualan+Lain)', data: dataPemasukanTotal.length > 0 ? dataPemasukanTotal : [0],
+                        backgroundColor: '#3b82f6', borderRadius: 4, order: 2
                     },
                     {
-                        type: 'bar',
-                        label: 'Total Pengeluaran',
-                        data: dataPengeluaran.length > 0 ? dataPengeluaran : [0],
-                        backgroundColor: '#ef4444', // Merah
-                        borderRadius: 4,
-                        order: 3
+                        type: 'bar', label: 'Total Pengeluaran', data: dataPengeluaran.length > 0 ? dataPengeluaran : [0],
+                        backgroundColor: '#ef4444', borderRadius: 4, order: 3
                     }
                 ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top' } } }
+        });
+    }
+
+    // ==========================================
+    // RENDER FUNGSI: CHART ANALISIS PRODUK
+    // ==========================================
+    function renderProductChart() {
+        const ctx = document.getElementById('productChart').getContext('2d');
+        
+        let qtyMap = {};
+        URUTAN_MENU.forEach(m => qtyMap[m.toLowerCase()] = 0);
+
+        globalData.penjualan.forEach(r => {
+            let itemName = String(r.item).toLowerCase();
+            let qty = Number(r.qty || 0);
+            if(qtyMap[itemName] !== undefined) qtyMap[itemName] += qty;
+            else qtyMap[itemName] = qty;
+        });
+
+        // Ekstrak label dan data (Sesuai urutan menu)
+        let labels = URUTAN_MENU.map(m => m.replace('-', ' '));
+        let dataQty = URUTAN_MENU.map(m => qtyMap[m.toLowerCase()]);
+
+        if(productChartInstance) productChartInstance.destroy();
+
+        productChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Kuantitas Terjual',
+                    data: dataQty,
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', // Eka Biru
+                        'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)'  // Hudan Cyan
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 2,
+                    borderRadius: 4
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
                 plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) label += ': ';
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed.y);
-                                }
-                                return label;
-                            }
-                        }
-                    }
+                    legend: { display: false }
                 },
                 scales: {
-                    y: { beginAtZero: true }
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    x: { ticks: { maxRotation: 45, minRotation: 45 } }
                 }
             }
         });
     }
 
-    // Modal Konfirmasi Penjualan
+    // ==========================================
+    // CHECKOUT DAN SUBMIT TRANSAKSI LAIN
+    // ==========================================
     function confirmPenjualanModal() {
         const items = [];
         Object.keys(MENU).forEach(item => {
@@ -603,7 +742,7 @@
         let total = 0;
         items.forEach(i => {
             total += i.subtotal;
-            summaryHtml += `<div class="d-flex justify-content-between mb-1"><span>${i.nama.replace('-', ' ')} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
+            summaryHtml += `<div class="d-flex justify-content-between mb-1 text-dark"><span>${i.nama.replace('-', ' ')} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
         });
 
         document.getElementById('checkoutSummaryList').innerHTML = summaryHtml;
@@ -654,15 +793,12 @@
         sendData({ action: "input_libur", tanggal: tgl, alasan: alasan });
     }
 
-    // Eksekusi Download Laporan ke Server untuk Generate Excel & Sheet
     function downloadExcelReportServer() {
-        const monthVal = document.getElementById('excelMonth').value; // format "YYYY-MM"
+        const monthVal = document.getElementById('excelMonth').value; 
         if(!monthVal) {
             showToast("Pilih bulan rekap terlebih dahulu!", "warning");
             return;
         }
-
-        // Panggil server agar generate sheet & berikan URL File
         sendData({ action: "generate_rekap", month: monthVal });
     }
 </script>
