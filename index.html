@@ -45,11 +45,23 @@
 
         /* Card Modern */
         .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; }
-        .item-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center; background: white; cursor: pointer; transition: all 0.2s; }
+        
+        /* Item Card Compact Version untuk Kasir agar tidak perlu scroll jauh */
+        .item-card { 
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
+            padding: 10px; /* Diperkecil */
+            text-align: center; 
+            background: white; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .item-card h6 { font-size: 14px; margin-bottom: 4px !important; }
+        .item-card p { font-size: 12px; margin-bottom: 8px !important; }
         .item-card:hover { border-color: var(--accent-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        .qty-btn { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; }
-        .qty-input { width: 45px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 8px; font-weight: 600; }
+        .qty-btn { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; }
+        .qty-input { width: 40px; height: 28px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 6px; font-weight: 600; font-size: 14px;}
 
         /* Stat Cards */
         .stat-card { border-left: 4px solid var(--accent-color); }
@@ -160,14 +172,12 @@
                     </div>
                 </div>
 
-                <!-- 1.B. TAB ANALISIS PRODUK (MENU BARU) -->
+                <!-- 1.B. TAB ANALISIS PRODUK -->
                 <div class="tab-pane fade" id="analisis_produk">
                     <div class="card p-4">
-                        <!-- Header & Filter -->
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
                             <h4 class="fw-bold m-0"><i class="fa-solid fa-chart-simple text-primary me-2"></i> Analisis Penjualan Layanan</h4>
                             
-                            <!-- Komponen Filter Khusus Analisis Produk -->
                             <div class="d-flex align-items-center gap-2">
                                 <label class="fw-semibold text-muted fs-6">Filter Waktu:</label>
                                 <select id="filterProductMode" class="form-select form-select-sm" onchange="updateProductFilterUI()">
@@ -201,22 +211,22 @@
                                 <input type="date" id="tglPenjualan" class="form-control form-control-sm">
                             </div>
                         </div>
-                        <hr class="text-muted mb-4">
+                        <hr class="text-muted mb-3">
 
-                        <!-- Border dan Pemisah Eka / Hudan (Beserta anti text block) -->
+                        <!-- Border dan Pemisah Eka / Hudan (Compact UI) -->
                         <div class="user-select-none">
-                            <div class="p-3 border border-primary border-2 rounded mb-4" style="background-color: #f0f7ff;">
-                                <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-user me-2"></i> Layanan Eka</h5>
-                                <div class="row g-3" id="menuContainerEka"></div>
+                            <div class="p-3 border border-primary border-2 rounded mb-3" style="background-color: #f0f7ff;">
+                                <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-user me-2"></i> Layanan Eka</h6>
+                                <div class="row g-2" id="menuContainerEka"></div>
                             </div>
                             
-                            <div class="p-3 border border-info border-2 rounded mb-4" style="background-color: #f0fbff;">
-                                <h5 class="fw-bold text-info mb-3"><i class="fa-solid fa-user me-2"></i> Layanan Hudan</h5>
-                                <div class="row g-3" id="menuContainerHudan"></div>
+                            <div class="p-3 border border-info border-2 rounded mb-3" style="background-color: #f0fbff;">
+                                <h6 class="fw-bold text-info mb-2"><i class="fa-solid fa-user me-2"></i> Layanan Hudan</h6>
+                                <div class="row g-2" id="menuContainerHudan"></div>
                             </div>
                         </div>
 
-                        <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm fs-5" onclick="confirmPenjualanModal()">
+                        <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm fs-6 mt-2" onclick="confirmPenjualanModal()">
                             <i class="fa-solid fa-cart-shopping me-2"></i> PROSES TRANSAKSI
                         </button>
                     </div>
@@ -287,7 +297,7 @@
                     </div>
                 </div>
 
-                <!-- 5.B TAB HISTORY DAN DELETE (MENU BARU) -->
+                <!-- 5.B TAB HISTORY DAN DELETE -->
                 <div class="tab-pane fade" id="history">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> History & Manajemen Data</h4>
@@ -355,7 +365,7 @@
     </div>
 </div>
 
-<!-- MODAL DETAIL HISTORY (FITUR BARU) -->
+<!-- MODAL DETAIL HISTORY -->
 <div class="modal fade" id="historyDetailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -380,7 +390,6 @@
     // MASUKKAN URL DEPLOYMENT APPS SCRIPT ANDA DI SINI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydD0IS2l0qAhUiiyz5lD-9DgXMIi6C6y0UzvMpoDkmAsSSHZkx8-Ux49E3y1gisrewNA/exec";
 
-    // Data Menu & Harga
     const MENU = {
         "keren-eka": 35000, "ganteng-eka": 40000, "elegan-eka": 45000, "anak-eka": 30000, "ayahanak-eka": 60000, "jenggot-eka": 15000,
         "keren-hudan": 35000, "ganteng-hudan": 40000, "elegan-hudan": 45000, "anak-hudan": 30000, "ayahanak-hudan": 60000, "jenggot-hudan": 15000
@@ -398,10 +407,9 @@
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date().toISOString().split('T')[0];
         
-        // Inisialisasi Tanggal
         document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
         document.getElementById('excelMonth').value = today.slice(0, 7);
-        document.getElementById('inputFilterProductMonth').value = today.slice(0, 7); // Default Product chart filter
+        document.getElementById('inputFilterProductMonth').value = today.slice(0, 7); 
 
         initMenuCards();
         populateYearDropdowns();
@@ -424,7 +432,7 @@
         toast.show();
     }
 
-    // Memisahkan render EKA dan HUDAN
+    // UI Kasir Compact
     function initMenuCards() {
         const containerEka = document.getElementById('menuContainerEka');
         const containerHudan = document.getElementById('menuContainerHudan');
@@ -434,15 +442,15 @@
 
         Object.keys(MENU).forEach(item => {
             const col = document.createElement('div');
-            col.className = 'col-6 col-md-4';
+            col.className = 'col-6 col-md-4 col-lg-3'; // Diperkecil kolomnya menjadi 4 per baris di layar besar
             col.innerHTML = `
                 <div class="item-card shadow-sm" onclick="incrementQty('${item}')">
-                    <h6 class="text-capitalize fw-bold text-dark mb-1">${item.replace('-', ' ')}</h6>
-                    <p class="text-muted small mb-2">Rp ${MENU[item].toLocaleString('id-ID')}</p>
+                    <h6 class="text-capitalize fw-bold text-dark">${item.replace('-', ' ')}</h6>
+                    <p class="text-muted fw-semibold">Rp ${MENU[item].toLocaleString('id-ID')}</p>
                     <div class="d-flex justify-content-center align-items-center" onclick="event.stopPropagation()">
-                        <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', -1)">-</button>
+                        <button class="btn btn-outline-secondary qty-btn" onclick="ubahQty('${item}', -1)">-</button>
                         <input type="number" id="qty-${item}" class="qty-input" value="0" min="0" readonly>
-                        <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', 1)">+</button>
+                        <button class="btn btn-outline-secondary qty-btn" onclick="ubahQty('${item}', 1)">+</button>
                     </div>
                 </div>`;
             
@@ -542,24 +550,48 @@
 
         let datesMap = {};
 
-        const addDataToMap = (dataArray, type) => {
-            dataArray.forEach(row => {
-                let tgl = String(row.tanggal || '').split('T')[0];
-                if (!tgl) return;
-                if (!datesMap[tgl]) datesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0 };
-                datesMap[tgl][type]++;
-            });
+        // Inisialisasi Tanggal
+        const ensureDateMap = (tgl) => {
+            if (!tgl) return false;
+            if (!datesMap[tgl]) {
+                datesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0, 
+                                  totPenjualan: 0, totPemasukan: 0, totPengeluaran: 0,
+                                  isLibur: false, alasanLibur: "" };
+            }
+            return true;
         };
 
-        addDataToMap(globalData.penjualan, 'penjualan');
-        addDataToMap(globalData.pemasukan, 'pemasukan');
-        addDataToMap(globalData.pengeluaran, 'pengeluaran');
+        globalData.penjualan.forEach(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if (ensureDateMap(tgl)) {
+                datesMap[tgl].penjualan++;
+                datesMap[tgl].totPenjualan += Number(row.subtotal || 0);
+            }
+        });
         
-        // Include Libur dates
+        globalData.pemasukan.forEach(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if (ensureDateMap(tgl)) {
+                datesMap[tgl].pemasukan++;
+                datesMap[tgl].totPemasukan += Number(row.nominal || 0);
+            }
+        });
+        
+        globalData.pengeluaran.forEach(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if (ensureDateMap(tgl)) {
+                datesMap[tgl].pengeluaran++;
+                datesMap[tgl].totPengeluaran += Number(row.nominal || 0);
+            }
+        });
+        
+        // Cek Libur
         globalData.libur.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
-            if (!tgl) return;
-            if (!datesMap[tgl]) datesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0 };
+            if (ensureDateMap(tgl)) {
+                datesMap[tgl].isLibur = true;
+                datesMap[tgl].alasanLibur = row.alasan || "Libur";
+            }
         });
 
         // Sort descending (dari terbaru)
@@ -571,16 +603,21 @@
         }
 
         sortedDates.forEach(date => {
-            let p = datesMap[date].penjualan;
-            let m = datesMap[date].pemasukan;
-            let k = datesMap[date].pengeluaran;
-            
+            let dataTgl = datesMap[date];
+            let labaBersih = (dataTgl.totPenjualan + dataTgl.totPemasukan) - dataTgl.totPengeluaran;
+            let classLaba = labaBersih >= 0 ? 'text-success' : 'text-danger';
+
+            let liburBanner = '';
+            if(dataTgl.isLibur) {
+                liburBanner = `<div class="bg-danger text-white text-center py-1 fw-bold mb-2 rounded small"><i class="fa-solid fa-calendar-xmark me-1"></i> HARI LIBUR: ${dataTgl.alasanLibur}</div>`;
+            }
+
             let cardHTML = `
                 <div class="card mb-3 border-secondary shadow-sm">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-calendar-day me-2 text-primary"></i> Tanggal: ${date}</h6>
                         <div>
-                            <button class="btn btn-sm btn-info text-white fw-bold shadow-sm me-2" onclick="showHistoryDetail('${date}')">
+                            <button class="btn btn-sm btn-info text-white fw-bold shadow-sm me-2" onclick="showHistoryDetail('${date}', ${labaBersih})">
                                 <i class="fa-solid fa-eye me-1"></i> Lihat Detail
                             </button>
                             <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="deleteDataByDate('${date}')">
@@ -589,10 +626,16 @@
                         </div>
                     </div>
                     <div class="card-body py-2">
+                        ${liburBanner}
                         <div class="row text-center small fw-semibold">
-                            <div class="col-4 border-end">Penjualan:<br><span class="text-primary fs-6">${p} Item</span></div>
-                            <div class="col-4 border-end">Pemasukan Lain:<br><span class="text-success fs-6">${m} Catatan</span></div>
-                            <div class="col-4">Pengeluaran:<br><span class="text-danger fs-6">${k} Catatan</span></div>
+                            <div class="col-4 border-end">Penjualan:<br><span class="text-primary fs-6">${dataTgl.penjualan} Item</span></div>
+                            <div class="col-4 border-end">Lain-lain:<br><span class="text-success fs-6">${dataTgl.pemasukan} Data</span></div>
+                            <div class="col-4">Pengeluaran:<br><span class="text-danger fs-6">${dataTgl.pengeluaran} Data</span></div>
+                        </div>
+                        <hr class="my-2 text-muted">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-secondary">Laba Bersih Hari Ini:</span>
+                            <span class="fw-bold fs-6 ${classLaba}">Rp ${labaBersih.toLocaleString('id-ID')}</span>
                         </div>
                     </div>
                 </div>
@@ -601,14 +644,21 @@
         });
     }
 
-    function showHistoryDetail(dateString) {
+    function showHistoryDetail(dateString, labaBersih) {
         document.getElementById('detailModalDate').innerText = dateString;
         
         let dayPenjualan = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === dateString);
         let dayPemasukan = globalData.pemasukan.filter(r => String(r.tanggal || '').split('T')[0] === dateString);
         let dayPengeluaran = globalData.pengeluaran.filter(r => String(r.tanggal || '').split('T')[0] === dateString);
+        let dayLibur = globalData.libur.find(r => String(r.tanggal || '').split('T')[0] === dateString);
 
         let bodyHtml = '';
+        let classLaba = labaBersih >= 0 ? 'text-success' : 'text-danger';
+
+        // Cek Libur
+        if (dayLibur) {
+             bodyHtml += `<div class="alert alert-danger fw-bold text-center border-0 py-2"><i class="fa-solid fa-calendar-xmark me-2"></i>TANGGAL INI DISET SEBAGAI HARI LIBUR<br><span class="small fw-normal">Alasan: ${dayLibur.alasan}</span></div>`;
+        }
 
         // Render Tabel Penjualan
         bodyHtml += `<h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-cash-register me-1"></i> Produk Terjual</h6>`;
@@ -670,6 +720,14 @@
         } else {
             bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada pengeluaran pada tanggal ini.</p>`;
         }
+
+        // Banner Total Laba
+        bodyHtml += `
+            <div class="p-3 bg-light border border-secondary rounded shadow-sm d-flex justify-content-between align-items-center mt-4">
+                <h5 class="fw-bold m-0 text-dark">Total Laba Bersih :</h5>
+                <h4 class="fw-bold m-0 ${classLaba}">Rp ${labaBersih.toLocaleString('id-ID')}</h4>
+            </div>
+        `;
 
         document.getElementById('historyDetailBody').innerHTML = bodyHtml;
         const detailModal = new bootstrap.Modal(document.getElementById('historyDetailModal'));
