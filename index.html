@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (xlsx) untuk Download Excel -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
         :root {
@@ -144,7 +142,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="card p-3 bg-white border">
-                                    <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-bar me-1"></i> Grafik Pendapatan & Pengeluaran</h6>
+                                    <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-bar me-1"></i> Grafik Pendapatan & Pengeluaran (Naik / Turun)</h6>
                                     <div style="position: relative; height:320px;">
                                         <canvas id="mainChart"></canvas>
                                     </div>
@@ -241,7 +239,7 @@
                 <div class="tab-pane fade" id="laporan">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-excel text-success me-2"></i> Output & Download Laporan Excel</h4>
-                        <p class="text-muted">Download rekapitulasi data harian lengkap dengan rincian item layanan, pengeluaran, dan total penghasilan bersih persis seperti format template Excel standar Anda.</p>
+                        <p class="text-muted">Generate & Download rekapitulasi data harian lengkap dengan rincian item, pengeluaran, dan total penghasilan bersih persis seperti format template Excel standar Anda. Sistem akan membuat Sheet baru di Google Spreadsheet Anda juga.</p>
                         <hr class="text-muted">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-5">
@@ -249,8 +247,8 @@
                                 <input type="month" id="excelMonth" class="form-control">
                             </div>
                             <div class="col-md-7">
-                                <button class="btn btn-success w-100 py-2 fw-bold shadow-sm" onclick="downloadExcelReport()">
-                                    <i class="fa-solid fa-file-arrow-down me-2"></i> DOWNLOAD EXCEL REKAP BULANAN
+                                <button class="btn btn-success w-100 py-2 fw-bold shadow-sm" onclick="downloadExcelReportServer()">
+                                    <i class="fa-solid fa-file-arrow-down me-2"></i> GENERATE & DOWNLOAD EXCEL
                                 </button>
                             </div>
                         </div>
@@ -297,7 +295,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // URL API Permanen sesuai permintaan
+    // MASUKKAN URL DEPLOYMENT APPS SCRIPT ANDA DI SINI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydD0IS2l0qAhUiiyz5lD-9DgXMIi6C6y0UzvMpoDkmAsSSHZkx8-Ux49E3y1gisrewNA/exec";
 
     // Data Menu & Harga
@@ -309,7 +307,6 @@
     let globalData = { penjualan: [], pemasukan: [], pengeluaran: [], libur: [] };
     let mainChartInstance = null;
 
-    // Inisialisasi awal saat halaman dimuat
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date().toISOString().split('T')[0];
         document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
@@ -377,7 +374,7 @@
         }
     }
 
-    // Ambil Data dari Backend Apps Script (GET)
+    // Ambil Data dari Backend
     async function fetchAllData() {
         showLoading(true, "Mengambil data dari Google Sheet...");
         try {
@@ -398,7 +395,7 @@
 
     // Kirim Data ke Backend (POST)
     async function sendData(payload) {
-        showLoading(true, "Menyimpan data...");
+        showLoading(true, payload.action === 'generate_rekap' ? "Menyusun Rekap Data (memakan waktu beberapa detik)..." : "Menyimpan data...");
         try {
             const res = await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -406,15 +403,22 @@
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
+            
             if(data.status === 'success') {
                 showToast(data.message, "success");
-                // Reset input forms
-                document.querySelectorAll('input[type="number"], input[type="text"]:not([readonly])').forEach(el => el.value = '');
-                Object.keys(MENU).forEach(item => {
-                    const qInput = document.getElementById(`qty-${item}`);
-                    if(qInput) qInput.value = 0;
-                });
-                fetchAllData();
+                
+                // Khusus jika actionnya adalah download/generate report
+                if(payload.action === 'generate_rekap' && data.url) {
+                    window.location.href = data.url; // Otomatis trigger file Excel
+                } else {
+                    // Reset input forms
+                    document.querySelectorAll('input[type="number"], input[type="text"]:not([readonly])').forEach(el => el.value = '');
+                    Object.keys(MENU).forEach(item => {
+                        const qInput = document.getElementById(`qty-${item}`);
+                        if(qInput) qInput.value = 0;
+                    });
+                    fetchAllData();
+                }
             } else {
                 showToast("Gagal: " + data.message, "danger");
             }
@@ -479,13 +483,13 @@
         document.getElementById('statPengeluaran').innerText = `Rp ${totPengeluaran.toLocaleString('id-ID')}`;
         document.getElementById('statBersih').innerText = `Rp ${bersih.toLocaleString('id-ID')}`;
 
-        renderChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran, mode);
+        renderChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran);
     }
 
-    function renderChart(penjualan, pemasukan, pengeluaran, mode) {
+    // CHART.JS MODERN DENGAN GRAFIK NAIK / TURUN
+    function renderChart(penjualan, pemasukan, pengeluaran) {
         const ctx = document.getElementById('mainChart').getContext('2d');
         
-        // Agregasi data per tanggal untuk grafik
         let dateMap = {};
         
         penjualan.forEach(r => {
@@ -493,13 +497,11 @@
             if(!dateMap[tgl]) dateMap[tgl] = { pen: 0, pem: 0, peng: 0 };
             dateMap[tgl].pen += Number(r.subtotal || 0);
         });
-
         pemasukan.forEach(r => {
             let tgl = String(r.tanggal || '').split('T')[0];
             if(!dateMap[tgl]) dateMap[tgl] = { pen: 0, pem: 0, peng: 0 };
             dateMap[tgl].pem += Number(r.nominal || 0);
         });
-
         pengeluaran.forEach(r => {
             let tgl = String(r.tanggal || '').split('T')[0];
             if(!dateMap[tgl]) dateMap[tgl] = { pen: 0, pem: 0, peng: 0 };
@@ -508,35 +510,74 @@
 
         let sortedDates = Object.keys(dateMap).sort();
         let labels = sortedDates.map(d => d);
-        let dataPenjualan = sortedDates.map(d => dateMap[d].pen + dateMap[d].pem);
+        let dataPemasukanTotal = sortedDates.map(d => dateMap[d].pen + dateMap[d].pem);
         let dataPengeluaran = sortedDates.map(d => dateMap[d].peng);
+        
+        // Kalkulasi Garis Pendapatan Bersih (Naik / Turun)
+        let dataBersih = sortedDates.map(d => (dateMap[d].pen + dateMap[d].pem) - dateMap[d].peng);
 
         if(mainChartInstance) mainChartInstance.destroy();
 
+        // Menggunakan Combination Chart (Line & Bar)
         mainChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels.length > 0 ? labels : ['Belum ada data'],
                 datasets: [
                     {
-                        label: 'Total Pemasukan (Penjualan+Lain)',
-                        data: dataPenjualan.length > 0 ? dataPenjualan : [0],
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 6
+                        type: 'line',
+                        label: 'Pendapatan Bersih (Naik/Turun)',
+                        data: dataBersih.length > 0 ? dataBersih : [0],
+                        borderColor: '#10b981', // Hijau terang modern
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.3, // Curve halus (Smooth)
+                        fill: true,
+                        order: 1 // Garis di atas bar
                     },
                     {
+                        type: 'bar',
+                        label: 'Total Kotor (Penjualan+Lain)',
+                        data: dataPemasukanTotal.length > 0 ? dataPemasukanTotal : [0],
+                        backgroundColor: '#3b82f6', // Biru
+                        borderRadius: 4,
+                        order: 2
+                    },
+                    {
+                        type: 'bar',
                         label: 'Total Pengeluaran',
                         data: dataPengeluaran.length > 0 ? dataPengeluaran : [0],
-                        backgroundColor: '#ef4444',
-                        borderRadius: 6
+                        backgroundColor: '#ef4444', // Merah
+                        borderRadius: 4,
+                        order: 3
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
-                    legend: { position: 'top' }
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 },
                 scales: {
                     y: { beginAtZero: true }
@@ -613,76 +654,16 @@
         sendData({ action: "input_libur", tanggal: tgl, alasan: alasan });
     }
 
-    // Fitur Download Laporan Excel (Format sesuai Screenshot)
-    function downloadExcelReport() {
+    // Eksekusi Download Laporan ke Server untuk Generate Excel & Sheet
+    function downloadExcelReportServer() {
         const monthVal = document.getElementById('excelMonth').value; // format "YYYY-MM"
         if(!monthVal) {
             showToast("Pilih bulan rekap terlebih dahulu!", "warning");
             return;
         }
 
-        let [year, month] = monthVal.split('-');
-        let daysInMonth = new Date(year, month, 0).getDate();
-
-        let excelRows = [
-            ["Tanggal", "Tipe", "Item", "Jumlah", "Harga", "Subtotal"]
-        ];
-
-        // Loop per tanggal dalam bulan tersebut (misal tgl 1 s/d tgl 31)
-        for(let d = 1; d <= daysInMonth; d++) {
-            let dayStr = String(d).padStart(2, '0');
-            let dateFormatted = `${year}-${month}-${dayStr}`;
-            let tglLabel = `tgl ${d}`;
-
-            // Cari penjualan pada tanggal ini
-            let dayPenjualan = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === dateFormatted);
-            let dayPemasukan = globalData.pemasukan.filter(r => String(r.tanggal || '').split('T')[0] === dateFormatted);
-            let dayPengeluaran = globalData.pengeluaran.filter(r => String(r.tanggal || '').split('T')[0] === dateFormatted);
-
-            let totalPenjualanHariIni = 0;
-
-            // Masukkan seluruh item menu standar ke baris harian (mengikuti template screenshot)
-            Object.keys(MENU).forEach(menuName => {
-                let found = dayPenjualan.find(r => String(r.item).toLowerCase() === menuName.toLowerCase());
-                let qty = found ? Number(found.qty || 0) : 0;
-                let harga = MENU[menuName];
-                let subtotal = qty * harga;
-                totalPenjualanHariIni += subtotal;
-
-                excelRows.push([tglLabel, "Penjualan", menuName, qty, harga, subtotal]);
-            });
-
-            // Masukkan pemasukan tambahan jika ada
-            let totalPemasukanHariIni = 0;
-            dayPemasukan.forEach(p => {
-                let nom = Number(p.nominal || 0);
-                totalPemasukanHariIni += nom;
-                excelRows.push([tglLabel, "Pemasukan", p.keterangan, "", "", nom]);
-            });
-
-            // Masukkan pengeluaran
-            let totalPengeluaranHariIni = 0;
-            dayPengeluaran.forEach(p => {
-                let nom = Number(p.nominal || 0);
-                totalPengeluaranHariIni += nom;
-                excelRows.push([tglLabel, "Pengeluaran", p.keterangan, "", "", nom]);
-            });
-
-            // Hitung total bersih hari itu
-            let bersihHariIni = (totalPenjualanHariIni + totalPemasukanHariIni) - totalPengeluaranHariIni;
-
-            // Baris Total Penghasilan Bersih Hari Ini (persis seperti screenshot)
-            excelRows.push([tglLabel, "", "Total Penghasilan Bersih Hari Ini", "", "", bersihHariIni]);
-        }
-
-        // Buat Workbook Excel via SheetJS
-        const worksheet = XLSX.utils.aoa_to_sheet(excelRows);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Penjualan");
-
-        // Download file
-        XLSX.writeFile(workbook, `rekap_penjualan_${year}_${month}.xlsx`);
-        showToast("Laporan Excel berhasil di-download!", "success");
+        // Panggil server agar generate sheet & berikan URL File
+        sendData({ action: "generate_rekap", month: monthVal });
     }
 </script>
 </body>
