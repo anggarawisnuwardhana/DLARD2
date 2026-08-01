@@ -15,66 +15,62 @@
 <body>
 <nav class="navbar navbar-dark bg-dark mb-4">
     <div class="container">
-        <span class="navbar-brand mb-0 h1">💈 POS DLARD 2 Barbershop</span>
+        <span class="navbar-brand mb-0 h1">💈 POS DLARD 2</span>
     </div>
 </nav>
 
 <div class="container">
-    <!-- Notifikasi -->
     <div id="alertBox" class="alert d-none" role="alert"></div>
 
     <ul class="nav nav-tabs mb-4" id="posTabs" role="tablist">
-        <li class="nav-item" role="presentation"><button class="nav-link active" id="penjualan-tab" data-bs-toggle="tab" data-bs-target="#penjualan" type="button" role="tab">Penjualan</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="pemasukan-tab" data-bs-toggle="tab" data-bs-target="#pemasukan" type="button" role="tab">Pemasukan</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="pengeluaran-tab" data-bs-toggle="tab" data-bs-target="#pengeluaran" type="button" role="tab">Pengeluaran</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="libur-tab" data-bs-toggle="tab" data-bs-target="#libur" type="button" role="tab">Libur</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="laporan-tab" data-bs-toggle="tab" data-bs-target="#laporan" type="button" role="tab">Laporan</button></li>
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#penjualan">Penjualan</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pemasukan">Pemasukan</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pengeluaran">Pengeluaran</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#libur">Libur</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#laporan">Laporan</button></li>
     </ul>
 
     <div class="tab-content" id="posTabsContent">
-        <!-- SETUP SCRIPT URL -->
-        <div class="alert alert-warning">
-            <strong>Penting:</strong> Masukkan URL Web App Google Apps Script (berakhiran /exec) di bawah ini sebelum menggunakan sistem.
+        <!-- SETUP URL (Isi dengan URL Google Apps Script yang Anda Deploy) -->
+        <div class="alert alert-warning mb-4">
+            Masukkan URL Web App Google Apps Script Anda (akhiran /exec)
             <input type="text" id="scriptUrl" class="form-control mt-2" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
         </div>
 
-        <!-- PENJUALAN -->
-        <div class="tab-pane fade show active" id="penjualan" role="tabpanel">
-            <div class="mb-3">
-                <label class="form-label">Tanggal</label>
-                <input type="date" id="tglPenjualan" class="form-control">
-            </div>
+        <!-- TAB PENJUALAN -->
+        <div class="tab-pane fade show active" id="penjualan">
+            <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglPenjualan" class="form-control"></div>
             <div class="row" id="menuContainer"></div>
-            <button class="btn btn-primary w-100 mt-3" onclick="submitPenjualan()">Simpan Penjualan</button>
+            <button class="btn btn-primary w-100 mt-3 py-2 fw-bold" onclick="submitPenjualan()">SIMPAN PENJUALAN</button>
         </div>
 
-        <!-- PEMASUKAN -->
-        <div class="tab-pane fade" id="pemasukan" role="tabpanel">
+        <!-- TAB PEMASUKAN -->
+        <div class="tab-pane fade" id="pemasukan">
             <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglPemasukan" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Keterangan</label><input type="text" id="ketPemasukan" class="form-control" placeholder="Contoh: Uang Pomade"></div>
+            <div class="mb-3"><label class="form-label">Keterangan</label><input type="text" id="ketPemasukan" class="form-control"></div>
             <div class="mb-3"><label class="form-label">Nominal (Rp)</label><input type="number" id="nomPemasukan" class="form-control"></div>
-            <button class="btn btn-success w-100" onclick="submitSingle('input_pemasukan')">Simpan Pemasukan</button>
+            <button class="btn btn-success w-100 py-2 fw-bold" onclick="submitSingle('input_pemasukan')">SIMPAN PEMASUKAN</button>
         </div>
 
-        <!-- PENGELUARAN -->
-        <div class="tab-pane fade" id="pengeluaran" role="tabpanel">
+        <!-- TAB PENGELUARAN -->
+        <div class="tab-pane fade" id="pengeluaran">
             <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglPengeluaran" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Keterangan</label><input type="text" id="ketPengeluaran" class="form-control" placeholder="Contoh: Kasbon / Iuran / Pulsa"></div>
+            <div class="mb-3"><label class="form-label">Keterangan (Contoh: Kasbon)</label><input type="text" id="ketPengeluaran" class="form-control"></div>
             <div class="mb-3"><label class="form-label">Nominal (Rp)</label><input type="number" id="nomPengeluaran" class="form-control"></div>
-            <button class="btn btn-danger w-100" onclick="submitSingle('input_pengeluaran')">Simpan Pengeluaran</button>
+            <button class="btn btn-danger w-100 py-2 fw-bold" onclick="submitSingle('input_pengeluaran')">SIMPAN PENGELUARAN</button>
         </div>
 
-        <!-- LIBUR -->
-        <div class="tab-pane fade" id="libur" role="tabpanel">
+        <!-- TAB LIBUR -->
+        <div class="tab-pane fade" id="libur">
             <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="tglLibur" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Alasan Libur</label><input type="text" id="alasanLibur" class="form-control" placeholder="Contoh: Sakit / Libur Nasional"></div>
-            <button class="btn btn-secondary w-100" onclick="submitLibur()">Simpan Libur</button>
+            <div class="mb-3"><label class="form-label">Alasan</label><input type="text" id="alasanLibur" class="form-control"></div>
+            <button class="btn btn-secondary w-100 py-2 fw-bold" onclick="submitLibur()">SIMPAN LIBUR</button>
         </div>
 
-        <!-- LAPORAN -->
-        <div class="tab-pane fade" id="laporan" role="tabpanel">
-            <button class="btn btn-info w-100 mb-4 text-white" onclick="loadLaporan()">Muat Laporan Keseluruhan</button>
-            <div id="laporanLoading" class="text-center d-none">Memuat data dari Google Sheet...</div>
+        <!-- TAB LAPORAN -->
+        <div class="tab-pane fade" id="laporan">
+            <button class="btn btn-info w-100 mb-4 text-white py-2 fw-bold" onclick="loadLaporan()">MUAT LAPORAN</button>
+            <div id="laporanLoading" class="text-center d-none">Mengambil data dari Google Sheet...</div>
             <div id="laporanContent"></div>
         </div>
     </div>
@@ -82,7 +78,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Set Default Date to Today
     document.querySelectorAll('input[type="date"]').forEach(el => el.valueAsDate = new Date());
 
     const MENU = {
@@ -90,7 +85,6 @@
         "keren-hudan": 35000, "ganteng-hudan": 40000, "elegan-hudan": 45000, "anak-hudan": 30000, "ayahanak-hudan": 60000, "jenggot-hudan": 15000
     };
 
-    // Render Menu Penjualan
     const menuContainer = document.getElementById('menuContainer');
     Object.keys(MENU).forEach(item => {
         const col = document.createElement('div');
@@ -104,16 +98,13 @@
                     <input type="number" id="qty-${item}" class="qty-input" value="0" min="0" readonly>
                     <button class="btn btn-sm btn-outline-secondary qty-btn" onclick="ubahQty('${item}', 1)">+</button>
                 </div>
-            </div>
-        `;
+            </div>`;
         menuContainer.appendChild(col);
     });
 
     function ubahQty(item, delta) {
         const input = document.getElementById(`qty-${item}`);
-        let val = parseInt(input.value) + delta;
-        if (val < 0) val = 0;
-        input.value = val;
+        input.value = Math.max(0, parseInt(input.value) + delta);
     }
 
     function showAlert(msg, type="success") {
@@ -121,21 +112,20 @@
         box.className = `alert alert-${type} mt-3`;
         box.innerText = msg;
         box.classList.remove('d-none');
-        setTimeout(() => box.classList.add('d-none'), 3000);
+        setTimeout(() => box.classList.add('d-none'), 4000);
         window.scrollTo(0,0);
     }
 
     function getUrl() {
         const url = document.getElementById('scriptUrl').value.trim();
-        if(!url) { showAlert("Masukkan URL Web App Google Script dulu di kotak kuning!", "danger"); return null; }
+        if(!url) { showAlert("Penting: Masukkan URL Google Script Anda terlebih dahulu!", "danger"); return null; }
         return url;
     }
 
     async function sendData(payload) {
-        const url = getUrl();
-        if(!url) return;
+        const url = getUrl(); if(!url) return;
         try {
-            // Menggunakan text/plain untuk bypass CORS preflight di Apps Script
+            // Menggunakan header text/plain untuk melewati restriksi CORS preflight Google Apps Script
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -144,14 +134,9 @@
             const data = await res.json();
             if(data.status === 'success') {
                 showAlert(data.message, "success");
-                // Reset inputs
                 document.querySelectorAll('input[type="number"], input[type="text"]:not(#scriptUrl)').forEach(el => el.value = el.id.startsWith('qty') ? 0 : '');
-            } else {
-                showAlert("Error: " + data.message, "danger");
             }
-        } catch (err) {
-            showAlert("Gagal menghubungi server. Pastikan URL benar dan internet jalan.", "danger");
-        }
+        } catch (err) { showAlert("Koneksi gagal. Periksa URL Web App atau Jaringan Internet.", "danger"); }
     }
 
     function submitPenjualan() {
@@ -160,83 +145,49 @@
             const qty = parseInt(document.getElementById(`qty-${item}`).value);
             if(qty > 0) items.push({ nama: item, qty: qty });
         });
-        if(items.length === 0) return showAlert("Belum ada item penjualan yang diisi!", "warning");
-        
-        const payload = {
-            action: "input_penjualan",
-            tanggal: document.getElementById('tglPenjualan').value,
-            items: items
-        };
-        sendData(payload);
+        if(items.length === 0) return showAlert("Belum ada qty yang diisi!", "warning");
+        sendData({ action: "input_penjualan", tanggal: document.getElementById('tglPenjualan').value, items: items });
     }
 
     function submitSingle(action) {
-        let prefix = action.split('_')[1]; // pemasukan atau pengeluaran
+        let prefix = action.split('_')[1];
         let tgl = document.getElementById(`tgl${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
         let ket = document.getElementById(`ket${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
         let nom = document.getElementById(`nom${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
-        
-        if(!ket || !nom) return showAlert("Harap isi Keterangan dan Nominal!", "warning");
-
+        if(!ket || !nom) return showAlert("Isi keterangan dan nominal uang!", "warning");
         sendData({ action: action, tanggal: tgl, keterangan: ket, nominal: parseInt(nom) });
     }
 
     function submitLibur() {
         let tgl = document.getElementById('tglLibur').value;
         let alasan = document.getElementById('alasanLibur').value;
-        if(!alasan) return showAlert("Isi alasan libur terlebih dahulu!", "warning");
+        if(!alasan) return showAlert("Isi alasan libur!", "warning");
         sendData({ action: "input_libur", tanggal: tgl, alasan: alasan });
     }
 
     async function loadLaporan() {
-        const url = getUrl();
-        if(!url) return;
+        const url = getUrl(); if(!url) return;
         document.getElementById('laporanLoading').classList.remove('d-none');
         document.getElementById('laporanContent').innerHTML = '';
         try {
             const res = await fetch(url);
             const result = await res.json();
             if(result.status === "success") {
-                renderLaporan(result.data);
-            } else {
-                showAlert("Gagal memuat data dari Sheet.", "danger");
+                let totPenjualan = 0; result.data.penjualan.forEach(r => totPenjualan += parseInt(r.subtotal || 0));
+                let totPemasukan = 0; result.data.pemasukan.forEach(r => totPemasukan += parseInt(r.nominal || 0));
+                let totPengeluaran = 0; result.data.pengeluaran.forEach(r => totPengeluaran += parseInt(r.nominal || 0));
+                let bersih = totPenjualan + totPemasukan - totPengeluaran;
+
+                document.getElementById('laporanContent').innerHTML = `
+                    <div class="row text-center mb-4">
+                        <div class="col-12 col-md-6 mb-3"><div class="card bg-primary text-white"><div class="card-body"><h5>Total Penjualan</h5><p class="fs-5">Rp ${totPenjualan.toLocaleString('id-ID')}</p></div></div></div>
+                        <div class="col-12 col-md-6 mb-3"><div class="card bg-success text-white"><div class="card-body"><h5>Pemasukan</h5><p class="fs-5">Rp ${totPemasukan.toLocaleString('id-ID')}</p></div></div></div>
+                        <div class="col-12 col-md-6 mb-3"><div class="card bg-danger text-white"><div class="card-body"><h5>Total Pengeluaran</h5><p class="fs-5">Rp ${totPengeluaran.toLocaleString('id-ID')}</p></div></div></div>
+                        <div class="col-12 col-md-6 mb-3"><div class="card bg-info text-white"><div class="card-body"><h5>Penghasilan Bersih</h5><p class="fs-4 fw-bold">Rp ${bersih.toLocaleString('id-ID')}</p></div></div></div>
+                    </div>`;
             }
-        } catch(e) {
-            showAlert("Gagal mengambil data dari Google Sheet.", "danger");
-        }
+        } catch(e) { showAlert("Gagal mengambil data dari server.", "danger"); }
         document.getElementById('laporanLoading').classList.add('d-none');
-    }
-
-    function renderLaporan(data) {
-        let totPenjualan = 0;
-        data.penjualan.forEach(r => totPenjualan += parseInt(r.subtotal || 0));
-        
-        let totPemasukan = 0;
-        data.pemasukan.forEach(r => totPemasukan += parseInt(r.nominal || 0));
-        
-        let totPengeluaran = 0;
-        data.pengeluaran.forEach(r => totPengeluaran += parseInt(r.nominal || 0));
-        
-        let bersih = totPenjualan + totPemasukan - totPengeluaran;
-
-        let html = `
-            <div class="row text-center mb-4">
-                <div class="col-12 col-md-6 mb-3">
-                    <div class="card bg-primary text-white"><div class="card-body"><h5>Total Penjualan</h5><p class="fs-5">Rp ${totPenjualan.toLocaleString('id-ID')}</p></div></div>
-                </div>
-                <div class="col-12 col-md-6 mb-3">
-                    <div class="card bg-success text-white"><div class="card-body"><h5>Pemasukan Tambahan</h5><p class="fs-5">Rp ${totPemasukan.toLocaleString('id-ID')}</p></div></div>
-                </div>
-                <div class="col-12 col-md-6 mb-3">
-                    <div class="card bg-danger text-white"><div class="card-body"><h5>Total Pengeluaran</h5><p class="fs-5">Rp ${totPengeluaran.toLocaleString('id-ID')}</p></div></div>
-                </div>
-                <div class="col-12 col-md-6 mb-3">
-                    <div class="card bg-info text-white"><div class="card-body"><h5>Penghasilan Bersih</h5><p class="fs-4 fw-bold">Rp ${bersih.toLocaleString('id-ID')}</p></div></div>
-                </div>
-            </div>
-            <p class="text-muted text-center"><small>*Data di atas menampilkan akumulasi seluruh catatan yang tersimpan di Google Sheet Anda saat ini.</small></p>
-        `;
-        document.getElementById('laporanContent').innerHTML = html;
     }
 </script>
 </body>
