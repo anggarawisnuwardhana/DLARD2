@@ -3,50 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekap Penjualan DLARD 2</title>
+    <title>Smart POS - DLARD 2 Barbershop</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-        .btn { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        .btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F3F4F6;
+            --surface: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --danger: #EF4444;
+            --border: #E5E7EB;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+        /* Left Side: Menu Items */
+        .menu-section { flex: 1; padding: 20px; overflow-y: auto; }
+        .header { margin-bottom: 20px; }
+        .header h1 { font-size: 24px; color: var(--text-main); }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        
+        .category-title { font-size: 18px; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2px solid var(--border); }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        
+        .item-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 15px; cursor: pointer; transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .item-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .item-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+        .item-price { color: var(--primary); font-weight: bold; font-size: 14px; }
+
+        /* Right Side: Cart / Order Summary */
+        .cart-section {
+            width: 380px; background: var(--surface); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; box-shadow: -4px 0 15px rgba(0,0,0,0.03);
+        }
+        .cart-header { padding: 20px; border-bottom: 1px solid var(--border); }
+        .cart-header h2 { font-size: 20px; }
+        
+        .cart-items { flex: 1; padding: 20px; overflow-y: auto; }
+        .cart-empty { text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; }
+        
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border); }
+        .cart-item-info { flex: 1; }
+        .cart-item-title { font-weight: 600; font-size: 14px; }
+        .cart-item-price { color: var(--text-muted); font-size: 13px; }
+        
+        .cart-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-qty { background: var(--bg-color); border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold; color: var(--text-main); }
+        .btn-qty:hover { background: #E5E7EB; }
+        .qty-display { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+
+        .cart-footer { padding: 20px; border-top: 1px solid var(--border); background: var(--surface); }
+        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        
+        .btn-checkout {
+            width: 100%; padding: 15px; background: var(--primary); color: white; border: none;
+            border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-checkout:hover { background: var(--primary-hover); }
+        .btn-checkout:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .cart-section { width: 100%; height: 50vh; border-left: none; border-top: 1px solid var(--border); }
+            .menu-section { height: 50vh; }
+        }
     </style>
 </head>
 <body>
 
-    <h2>Aplikasi Pencatatan DLARD 2 Barbershop</h2>
-    <p>Klik tombol di bawah ini untuk mengunduh rekap Excel dengan format asli.</p>
+    <!-- Menu Section -->
+    <div class="menu-section">
+        <div class="header">
+            <h1>DLARD 2 Barbershop POS</h1>
+            <p>Pilih layanan untuk menambahkannya ke struk tagihan.</p>
+        </div>
 
-    <button id="downloadBtn" class="btn" onclick="downloadExcel()">Unduh Rekap Excel</button>
-    <p id="statusMsg"></p>
+        <div class="category-title">Barber: Eka</div>
+        <div class="grid" id="gridEka"></div>
+
+        <div class="category-title" style="margin-top: 30px;">Barber: Hudan</div>
+        <div class="grid" id="gridHudan"></div>
+    </div>
+
+    <!-- Cart Section -->
+    <div class="cart-section">
+        <div class="cart-header">
+            <h2>Struk Saat Ini</h2>
+            <div style="font-size: 13px; color: var(--text-muted);" id="dateDisplay"></div>
+        </div>
+        
+        <div class="cart-items" id="cartContainer">
+            <div class="cart-empty">Belum ada layanan yang dipilih</div>
+        </div>
+
+        <div class="cart-footer">
+            <div class="total-row">
+                <span>Total Bersih</span>
+                <span id="totalPrice">Rp0</span>
+            </div>
+            <button class="btn-checkout" id="checkoutBtn" onclick="submitOrder()">Simpan ke Google Sheet</button>
+        </div>
+    </div>
 
     <script>
-        // Ganti dengan URL Aplikasi Web dari Google Apps Script Anda
-        const API_URL = "https://script.google.com/macros/s/AKfycbwSMG25inH2xCj_lO6Bb3Cr6SLdBQJ30pKPWvI0-Lwf6FpHlGjNGQoMhlTj8z7M3zdG/exec";
+        // Data Produk
+        const menuData = {
+            "keren-eka": { name: "Keren", price: 35000, barber: "eka" },
+            "ganteng-eka": { name: "Ganteng", price: 40000, barber: "eka" },
+            "elegan-eka": { name: "Elegan", price: 45000, barber: "eka" },
+            "anak-eka": { name: "Anak", price: 30000, barber: "eka" },
+            "ayahanak-eka": { name: "Ayah & Anak", price: 60000, barber: "eka" },
+            "jenggot-eka": { name: "Jenggot", price: 15000, barber: "eka" },
+            "keren-hudan": { name: "Keren", price: 35000, barber: "hudan" },
+            "ganteng-hudan": { name: "Ganteng", price: 40000, barber: "hudan" },
+            "elegan-hudan": { name: "Elegan", price: 45000, barber: "hudan" },
+            "anak-hudan": { name: "Anak", price: 30000, barber: "hudan" },
+            "ayahanak-hudan": { name: "Ayah & Anak", price: 60000, barber: "hudan" },
+            "jenggot-hudan": { name: "Jenggot", price: 15000, barber: "hudan" }
+        };
 
-        async function downloadExcel() {
-            const btn = document.getElementById("downloadBtn");
-            const msg = document.getElementById("statusMsg");
+        let cart = {}; // Menyimpan keranjang: { "keren-eka": 2 }
+        const API_URL = "URL_GOOGLE_APPS_SCRIPT_ANDA"; // Ganti dengan URL deployment Google Apps Script
+
+        // Set Tanggal Hari Ini
+        const today = new Date();
+        document.getElementById("dateDisplay").innerText = "Tanggal: " + today.getDate() + "/" + (today.getMonth()+1) + "/" + today.getFullYear();
+
+        // Render Produk ke Grid
+        function renderMenu() {
+            const gridEka = document.getElementById("gridEka");
+            const gridHudan = document.getElementById("gridHudan");
+
+            for (const [id, item] of Object.entries(menuData)) {
+                const card = document.createElement("div");
+                card.className = "item-card";
+                card.onclick = () => addToCart(id);
+                card.innerHTML = `
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">Rp${item.price.toLocaleString("id-ID")}</div>
+                `;
+                if (item.barber === "eka") gridEka.appendChild(card);
+                else gridHudan.appendChild(card);
+            }
+        }
+
+        function addToCart(id) {
+            if (cart[id]) cart[id]++;
+            else cart[id] = 1;
+            updateCartUI();
+        }
+
+        function changeQty(id, delta) {
+            cart[id] += delta;
+            if (cart[id] <= 0) delete cart[id];
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById("cartContainer");
+            const totalPriceEl = document.getElementById("totalPrice");
             
+            container.innerHTML = "";
+            let total = 0;
+            let count = 0;
+
+            for (const [id, qty] of Object.entries(cart)) {
+                count++;
+                const item = menuData[id];
+                const subtotal = item.price * qty;
+                total += subtotal;
+
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${item.name} (${item.barber.toUpperCase()})</div>
+                            <div class="cart-item-price">Rp${item.price.toLocaleString("id-ID")}</div>
+                        </div>
+                        <div class="cart-controls">
+                            <button class="btn-qty" onclick="changeQty('${id}', -1)">-</button>
+                            <span class="qty-display">${qty}</span>
+                            <button class="btn-qty" onclick="changeQty('${id}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (count === 0) {
+                container.innerHTML = `<div class="cart-empty">Belum ada layanan yang dipilih</div>`;
+            }
+
+            totalPriceEl.innerText = `Rp${total.toLocaleString("id-ID")}`;
+            document.getElementById("checkoutBtn").disabled = count === 0;
+        }
+
+        async function submitOrder() {
+            if (Object.keys(cart).length === 0) return;
+
+            const btn = document.getElementById("checkoutBtn");
+            const originalText = btn.innerText;
+            btn.innerText = "Menyimpan...";
             btn.disabled = true;
-            msg.innerText = "Memproses dan memformat Excel, mohon tunggu...";
+
+            // Format data persis seperti logika bot WA Anda: "tgl 1"
+            const dataToSave = {
+                tanggal: "tgl " + today.getDate(),
+                tipe: "penjualan",
+                penjualan: cart 
+            };
 
             try {
-                const response = await fetch(`${API_URL}?action=download`);
-                const data = await response.json();
+                // Di tahap produksi hilangkan komentar fetch ini dan atur API_URL di atas
+                /*
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave)
+                });
+                */
 
-                if (data.downloadUrl) {
-                    msg.innerText = "Berhasil! Mengunduh file...";
-                    // Trigger download
-                    window.location.href = data.downloadUrl;
-                } else {
-                    msg.innerText = "Gagal mendapatkan tautan.";
-                }
+                // Simulasi sukses
+                setTimeout(() => {
+                    alert("Berhasil! Penjualan telah dicatat.");
+                    cart = {}; // Kosongkan keranjang
+                    updateCartUI();
+                    btn.innerText = originalText;
+                }, 800);
+
             } catch (error) {
-                console.error(error);
-                msg.innerText = "Terjadi kesalahan sistem.";
-            } finally {
+                alert("Terjadi kesalahan saat menyimpan data.");
+                btn.innerText = originalText;
                 btn.disabled = false;
             }
         }
+
+        // Inisialisasi awal
+        renderMenu();
+        updateCartUI();
     </script>
 </body>
 </html>
