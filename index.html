@@ -46,11 +46,11 @@
         /* Card Modern */
         .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; }
         
-        /* Item Card Compact Version untuk Kasir agar tidak perlu scroll jauh */
+        /* Item Card Compact Version */
         .item-card { 
             border: 1px solid #e2e8f0; 
             border-radius: 8px; 
-            padding: 10px; /* Diperkecil */
+            padding: 10px; 
             text-align: center; 
             background: white; 
             cursor: pointer; 
@@ -98,6 +98,7 @@
                 <div class="nav flex-column nav-pills" id="posTabs" role="tablist">
                     <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#dashboard"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard & Grafik</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#analisis_produk"><i class="fa-solid fa-chart-simple me-2"></i> Analisis Produk</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#analisis_karyawan"><i class="fa-solid fa-users me-2"></i> Analisis Karyawan</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#penjualan"><i class="fa-solid fa-cash-register me-2"></i> POS / Kasir</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pemasukan"><i class="fa-solid fa-wallet me-2"></i> Pemasukan Dinamis</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pengeluaran"><i class="fa-solid fa-receipt me-2"></i> Pengeluaran</button>
@@ -191,11 +192,123 @@
                                 <select id="inputFilterProductYear" class="form-select form-select-sm d-none" onchange="renderProductChart()"></select>
                             </div>
                         </div>
-                        <p class="text-muted small mb-4">Grafik total perbandingan kuantitas layanan yang di-checkout berdasarkan filter waktu yang dipilih.</p>
+                        <p class="text-muted small mb-3">Lihat performa produk / layanan Anda dari segi Kuantitas Terjual maupun Total Pendapatan Rupiah.</p>
+
+                        <!-- Stat Ringkasan Produk -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4">
+                                    <span class="text-muted small fw-semibold">Total Item Terjual (Qty)</span>
+                                    <h5 class="fw-bold text-info mt-1 mb-0" id="statProductQty">0 Item</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4">
+                                    <span class="text-muted small fw-semibold">Total Penjualan Produk (Rp)</span>
+                                    <h5 class="fw-bold text-primary mt-1 mb-0" id="statProductRevenue">Rp 0</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Grafik Kuantitas -->
+                            <div class="col-md-6">
+                                <div class="card p-3 bg-white border shadow-sm">
+                                    <h6 class="fw-bold text-secondary mb-3 text-center">Grafik Kuantitas Terjual</h6>
+                                    <div style="position: relative; height:300px;">
+                                        <canvas id="productChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Grafik Pendapatan / Penjualan Total -->
+                            <div class="col-md-6">
+                                <div class="card p-3 bg-white border shadow-sm">
+                                    <h6 class="fw-bold text-secondary mb-3 text-center">Grafik Total Penjualan (Rp)</h6>
+                                    <div style="position: relative; height:300px;">
+                                        <canvas id="productRevenueChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1.C. TAB ANALISIS KARYAWAN -->
+                <div class="tab-pane fade" id="analisis_karyawan">
+                    <div class="card p-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                            <h4 class="fw-bold m-0"><i class="fa-solid fa-users text-primary me-2"></i> Analisis Karyawan</h4>
+                            
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="fw-semibold text-muted fs-6">Filter Waktu:</label>
+                                <select id="filterKaryawanMode" class="form-select form-select-sm" onchange="updateKaryawanFilterUI()">
+                                    <option value="all">Seluruh Waktu</option>
+                                    <option value="date">Per Tanggal</option>
+                                    <option value="month">Per Bulan</option>
+                                    <option value="year">Per Tahun</option>
+                                </select>
+                                <input type="date" id="inputFilterKaryawanDate" class="form-control form-control-sm d-none" onchange="renderKaryawanDashboard()">
+                                <input type="month" id="inputFilterKaryawanMonth" class="form-control form-control-sm d-none" onchange="renderKaryawanDashboard()">
+                                <select id="inputFilterKaryawanYear" class="form-select form-select-sm d-none" onchange="renderKaryawanDashboard()"></select>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-4">Dashboard profil karyawan dan kalkulasi estimasi gaji (40% dari subtotal layanan) berdasarkan filter waktu yang dipilih.</p>
                         
-                        <div class="card p-3 bg-white border shadow-sm">
-                            <div style="position: relative; height:400px;">
-                                <canvas id="productChart"></canvas>
+                        <div class="row g-4">
+                            <!-- BORDER EKA -->
+                            <div class="col-md-6">
+                                <div class="card p-4 border border-primary border-2 shadow-sm h-100" style="background-color: #f8fbff;">
+                                    <h5 class="fw-bold text-primary border-bottom border-primary pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: Eka</h5>
+                                    
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold text-secondary mb-1">Umur (Bisa Diedit Manual)</label>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Contoh: 25 Tahun">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold text-secondary mb-1">Alamat (Bisa Diedit Manual)</label>
+                                        <textarea class="form-control form-control-sm" rows="2" placeholder="Ketikkan alamat di sini..."></textarea>
+                                    </div>
+                                    
+                                    <div class="p-3 bg-white border rounded shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-semibold text-muted small">Total Hasil Layanan Eka:</span>
+                                            <span class="fw-bold text-dark fs-5" id="totalLayananEka">Rp 0</span>
+                                        </div>
+                                        <hr class="my-2 text-muted">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold text-primary">Estimasi Gaji (40%):</span>
+                                            <span class="fw-bold text-success fs-5" id="gajiEka">Rp 0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- BORDER HUDAN -->
+                            <div class="col-md-6">
+                                <div class="card p-4 border border-info border-2 shadow-sm h-100" style="background-color: #f4fcff;">
+                                    <h5 class="fw-bold text-info border-bottom border-info pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: Hudan</h5>
+                                    
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold text-secondary mb-1">Umur (Bisa Diedit Manual)</label>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Contoh: 24 Tahun">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold text-secondary mb-1">Alamat (Bisa Diedit Manual)</label>
+                                        <textarea class="form-control form-control-sm" rows="2" placeholder="Ketikkan alamat di sini..."></textarea>
+                                    </div>
+                                    
+                                    <div class="p-3 bg-white border rounded shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-semibold text-muted small">Total Hasil Layanan Hudan:</span>
+                                            <span class="fw-bold text-dark fs-5" id="totalLayananHudan">Rp 0</span>
+                                        </div>
+                                        <hr class="my-2 text-muted">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold text-info">Estimasi Gaji (40%):</span>
+                                            <span class="fw-bold text-success fs-5" id="gajiHudan">Rp 0</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -387,7 +500,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // ===============================================
     // MASUKKAN URL DEPLOYMENT APPS SCRIPT ANDA DI SINI
+    // ===============================================
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydD0IS2l0qAhUiiyz5lD-9DgXMIi6C6y0UzvMpoDkmAsSSHZkx8-Ux49E3y1gisrewNA/exec";
 
     const MENU = {
@@ -403,6 +518,7 @@
     let globalData = { penjualan: [], pemasukan: [], pengeluaran: [], libur: [] };
     let mainChartInstance = null;
     let productChartInstance = null;
+    let productRevenueChartInstance = null;
 
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date().toISOString().split('T')[0];
@@ -410,6 +526,7 @@
         document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
         document.getElementById('excelMonth').value = today.slice(0, 7);
         document.getElementById('inputFilterProductMonth').value = today.slice(0, 7); 
+        document.getElementById('inputFilterKaryawanMonth').value = today.slice(0, 7); 
 
         initMenuCards();
         populateYearDropdowns();
@@ -442,7 +559,7 @@
 
         Object.keys(MENU).forEach(item => {
             const col = document.createElement('div');
-            col.className = 'col-6 col-md-4 col-lg-3'; // Diperkecil kolomnya menjadi 4 per baris di layar besar
+            col.className = 'col-6 col-md-4 col-lg-3'; 
             col.innerHTML = `
                 <div class="item-card shadow-sm" onclick="incrementQty('${item}')">
                     <h6 class="text-capitalize fw-bold text-dark">${item.replace('-', ' ')}</h6>
@@ -473,7 +590,11 @@
 
     function populateYearDropdowns() {
         const currentYear = new Date().getFullYear();
-        const yearSelects = [document.getElementById('inputFilterYear'), document.getElementById('inputFilterProductYear')];
+        const yearSelects = [
+            document.getElementById('inputFilterYear'), 
+            document.getElementById('inputFilterProductYear'),
+            document.getElementById('inputFilterKaryawanYear')
+        ];
         
         yearSelects.forEach(selectEl => {
             if(!selectEl) return;
@@ -497,6 +618,7 @@
                 globalData = result.data;
                 renderDashboard();
                 renderProductChart();
+                renderKaryawanDashboard(); // Eksekusi update dashboard Karyawan
                 renderHistory();
                 showToast("Data berhasil diperbarui!", "success");
             } else {
@@ -530,7 +652,7 @@
                         const qInput = document.getElementById(`qty-${item}`);
                         if(qInput) qInput.value = 0;
                     });
-                    fetchAllData(); // Refresh Data UI
+                    fetchAllData(); 
                 }
             } else {
                 showToast("Gagal: " + data.message, "danger");
@@ -550,7 +672,6 @@
 
         let datesMap = {};
 
-        // Inisialisasi Tanggal
         const ensureDateMap = (tgl) => {
             if (!tgl) return false;
             if (!datesMap[tgl]) {
@@ -585,7 +706,6 @@
             }
         });
         
-        // Cek Libur
         globalData.libur.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if (ensureDateMap(tgl)) {
@@ -594,7 +714,6 @@
             }
         });
 
-        // Sort descending (dari terbaru)
         let sortedDates = Object.keys(datesMap).sort((a, b) => b.localeCompare(a));
 
         if (sortedDates.length === 0) {
@@ -655,12 +774,10 @@
         let bodyHtml = '';
         let classLaba = labaBersih >= 0 ? 'text-success' : 'text-danger';
 
-        // Cek Libur
         if (dayLibur) {
              bodyHtml += `<div class="alert alert-danger fw-bold text-center border-0 py-2"><i class="fa-solid fa-calendar-xmark me-2"></i>TANGGAL INI DISET SEBAGAI HARI LIBUR<br><span class="small fw-normal">Alasan: ${dayLibur.alasan}</span></div>`;
         }
 
-        // Render Tabel Penjualan
         bodyHtml += `<h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-cash-register me-1"></i> Produk Terjual</h6>`;
         if(dayPenjualan.length > 0) {
             bodyHtml += `<div class="table-responsive mb-3"><table class="table table-sm table-bordered bg-white">
@@ -681,7 +798,6 @@
             bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada penjualan pada tanggal ini.</p>`;
         }
 
-        // Render Tabel Pemasukan
         bodyHtml += `<h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-wallet me-1"></i> Pemasukan Lain</h6>`;
         if(dayPemasukan.length > 0) {
             bodyHtml += `<ul class="list-group mb-3">`;
@@ -701,7 +817,6 @@
             bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada pemasukan lain pada tanggal ini.</p>`;
         }
 
-        // Render Tabel Pengeluaran
         bodyHtml += `<h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-receipt me-1"></i> Pengeluaran / Kasbon</h6>`;
         if(dayPengeluaran.length > 0) {
             bodyHtml += `<ul class="list-group mb-3">`;
@@ -721,7 +836,6 @@
             bodyHtml += `<p class="text-muted small mb-3 fst-italic">Tidak ada pengeluaran pada tanggal ini.</p>`;
         }
 
-        // Banner Total Laba
         bodyHtml += `
             <div class="p-3 bg-light border border-secondary rounded shadow-sm d-flex justify-content-between align-items-center mt-4">
                 <h5 class="fw-bold m-0 text-dark">Total Laba Bersih :</h5>
@@ -741,7 +855,7 @@
     }
 
     // ==========================================
-    // RENDER FUNGSI: DASHBOARD & FILTER CHART
+    // RENDER FUNGSI: DASHBOARD UTAMA
     // ==========================================
     function updateDashboardFilterUI() {
         const mode = document.getElementById('filterMode').value;
@@ -833,7 +947,7 @@
                 labels: labels.length > 0 ? labels : ['Belum ada data'],
                 datasets: [
                     {
-                        type: 'line', label: 'Pendapatan Bersih (Naik/Turun)', data: dataBersih.length > 0 ? dataBersih : [0],
+                        type: 'line', label: 'Pendapatan Bersih', data: dataBersih.length > 0 ? dataBersih : [0],
                         borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3,
                         pointBackgroundColor: '#fff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 4, tension: 0.3, fill: true, order: 1
                     },
@@ -852,7 +966,7 @@
     }
 
     // ==========================================
-    // RENDER FUNGSI: FILTER & CHART ANALISIS PRODUK
+    // RENDER FUNGSI: ANALISIS PRODUK
     // ==========================================
     function updateProductFilterUI() {
         const mode = document.getElementById('filterProductMode').value;
@@ -873,7 +987,6 @@
         const filterMonth = document.getElementById('inputFilterProductMonth').value;
         const filterYear = document.getElementById('inputFilterProductYear').value;
 
-        // Filter Penjualan based on inputs
         let filteredPenjualan = globalData.penjualan.filter(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if(mode === 'date') return tgl === filterDate;
@@ -882,52 +995,141 @@
             return true;
         });
 
-        const ctx = document.getElementById('productChart').getContext('2d');
+        const ctxQty = document.getElementById('productChart').getContext('2d');
+        const ctxRev = document.getElementById('productRevenueChart').getContext('2d');
         
         let qtyMap = {};
-        URUTAN_MENU.forEach(m => qtyMap[m.toLowerCase()] = 0);
+        let revMap = {};
+        let totalQtyTerjual = 0;
+        let totalRevenueProduk = 0;
+
+        URUTAN_MENU.forEach(m => {
+            qtyMap[m.toLowerCase()] = 0;
+            revMap[m.toLowerCase()] = 0;
+        });
 
         filteredPenjualan.forEach(r => {
             let itemName = String(r.item).toLowerCase();
             let qty = Number(r.qty || 0);
-            if(qtyMap[itemName] !== undefined) qtyMap[itemName] += qty;
-            else qtyMap[itemName] = qty;
+            let subtotal = Number(r.subtotal || 0);
+            
+            if(qtyMap[itemName] !== undefined) {
+                qtyMap[itemName] += qty;
+                revMap[itemName] += subtotal;
+            } else {
+                qtyMap[itemName] = qty;
+                revMap[itemName] = subtotal;
+            }
+            
+            totalQtyTerjual += qty;
+            totalRevenueProduk += subtotal;
         });
 
-        // Ekstrak label dan data (Sesuai urutan menu)
+        // Tampilkan ke dalam Card Stat
+        document.getElementById('statProductQty').innerText = `${totalQtyTerjual} Item`;
+        document.getElementById('statProductRevenue').innerText = `Rp ${totalRevenueProduk.toLocaleString('id-ID')}`;
+
         let labels = URUTAN_MENU.map(m => m.replace('-', ' '));
         let dataQty = URUTAN_MENU.map(m => qtyMap[m.toLowerCase()]);
+        let dataRev = URUTAN_MENU.map(m => revMap[m.toLowerCase()]);
 
+        const ekaColor = 'rgba(59, 130, 246, 0.8)';
+        const hudanColor = 'rgba(6, 182, 212, 0.8)';
+        const bgColors = [
+            ekaColor, ekaColor, ekaColor, ekaColor, ekaColor, ekaColor, // Eka
+            hudanColor, hudanColor, hudanColor, hudanColor, hudanColor, hudanColor // Hudan
+        ];
+
+        // 1. Chart Kuantitas
         if(productChartInstance) productChartInstance.destroy();
-
-        productChartInstance = new Chart(ctx, {
+        productChartInstance = new Chart(ctxQty, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Total Kuantitas Terjual',
-                    data: dataQty,
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.8)', // Eka Biru
-                        'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.8)'  // Hudan Cyan
-                    ],
-                    borderColor: 'rgba(255, 255, 255, 1)',
-                    borderWidth: 2,
-                    borderRadius: 4
+                    label: 'Total Kuantitas Terjual', data: dataQty,
+                    backgroundColor: bgColors, borderColor: '#fff', borderWidth: 1, borderRadius: 4
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                    x: { ticks: { maxRotation: 45, minRotation: 45 } }
-                }
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { maxRotation: 45, minRotation: 45 } } }
             }
         });
+
+        // 2. Chart Pendapatan (Rupiah)
+        if(productRevenueChartInstance) productRevenueChartInstance.destroy();
+        productRevenueChartInstance = new Chart(ctxRev, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Penjualan (Rp)', data: dataRev,
+                    backgroundColor: bgColors, borderColor: '#fff', borderWidth: 1, borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true }, x: { ticks: { maxRotation: 45, minRotation: 45 } } }
+            }
+        });
+    }
+
+    // ==========================================
+    // RENDER FUNGSI: ANALISIS KARYAWAN
+    // ==========================================
+    function updateKaryawanFilterUI() {
+        const mode = document.getElementById('filterKaryawanMode').value;
+        document.getElementById('inputFilterKaryawanDate').classList.add('d-none');
+        document.getElementById('inputFilterKaryawanMonth').classList.add('d-none');
+        document.getElementById('inputFilterKaryawanYear').classList.add('d-none');
+
+        if(mode === 'date') document.getElementById('inputFilterKaryawanDate').classList.remove('d-none');
+        if(mode === 'month') document.getElementById('inputFilterKaryawanMonth').classList.remove('d-none');
+        if(mode === 'year') document.getElementById('inputFilterKaryawanYear').classList.remove('d-none');
+
+        renderKaryawanDashboard();
+    }
+
+    function renderKaryawanDashboard() {
+        const mode = document.getElementById('filterKaryawanMode').value;
+        const filterDate = document.getElementById('inputFilterKaryawanDate').value;
+        const filterMonth = document.getElementById('inputFilterKaryawanMonth').value;
+        const filterYear = document.getElementById('inputFilterKaryawanYear').value;
+
+        // Filter Penjualan
+        let filteredPenjualan = globalData.penjualan.filter(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if(mode === 'date') return tgl === filterDate;
+            if(mode === 'month') return tgl.startsWith(filterMonth);
+            if(mode === 'year') return tgl.startsWith(filterYear);
+            return true;
+        });
+
+        let totalLayananEka = 0;
+        let totalLayananHudan = 0;
+
+        filteredPenjualan.forEach(r => {
+            let itemName = String(r.item).toLowerCase();
+            let subtotal = Number(r.subtotal || 0);
+
+            if (itemName.includes('eka')) {
+                totalLayananEka += subtotal;
+            } else if (itemName.includes('hudan')) {
+                totalLayananHudan += subtotal;
+            }
+        });
+
+        // Kalkulasi 40% Gaji Karyawan
+        let gajiEka = totalLayananEka * 0.40;
+        let gajiHudan = totalLayananHudan * 0.40;
+
+        // Masukkan ke DOM
+        document.getElementById('totalLayananEka').innerText = `Rp ${totalLayananEka.toLocaleString('id-ID')}`;
+        document.getElementById('gajiEka').innerText = `Rp ${gajiEka.toLocaleString('id-ID')}`;
+
+        document.getElementById('totalLayananHudan').innerText = `Rp ${totalLayananHudan.toLocaleString('id-ID')}`;
+        document.getElementById('gajiHudan').innerText = `Rp ${gajiHudan.toLocaleString('id-ID')}`;
     }
 
     // ==========================================
