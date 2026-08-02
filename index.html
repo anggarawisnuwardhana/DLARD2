@@ -97,7 +97,7 @@
             <div class="card p-3 sticky-top" style="top: 80px;">
                 <div class="nav flex-column nav-pills" id="posTabs" role="tablist">
                     <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#dashboard"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard & Grafik</button>
-                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#analisis_produk"><i class="fa-solid fa-chart-simple me-2"></i> Analisis Produk</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#analisis_produk"><i class="fa-solid fa-chart-simple me-2"></i> Analisis Penjualan</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#analisis_karyawan"><i class="fa-solid fa-users me-2"></i> Analisis Karyawan</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#penjualan"><i class="fa-solid fa-cash-register me-2"></i> POS / Kasir</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pemasukan"><i class="fa-solid fa-wallet me-2"></i> Pemasukan Dinamis</button>
@@ -173,7 +173,7 @@
                     </div>
                 </div>
 
-                <!-- 1.B. TAB ANALISIS PRODUK -->
+                <!-- 1.B. TAB ANALISIS PENJUALAN PRODUK -->
                 <div class="tab-pane fade" id="analisis_produk">
                     <div class="card p-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
@@ -192,10 +192,10 @@
                                 <select id="inputFilterProductYear" class="form-select form-select-sm d-none" onchange="renderProductChart()"></select>
                             </div>
                         </div>
-                        <p class="text-muted small mb-3">Lihat performa produk / layanan Anda dari segi Kuantitas Terjual maupun Total Pendapatan Rupiah.</p>
+                        <p class="text-muted small mb-3">Lihat performa layanan Anda dari segi Kuantitas Terjual maupun Total Pendapatan Rupiah.</p>
 
-                        <!-- Stat Ringkasan Produk -->
-                        <div class="row g-3 mb-4">
+                        <!-- Stat Ringkasan Produk & Rincian Qty -->
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4">
                                     <span class="text-muted small fw-semibold">Total Item Terjual (Qty)</span>
@@ -206,6 +206,18 @@
                                 <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4">
                                     <span class="text-muted small fw-semibold">Total Penjualan Produk (Rp)</span>
                                     <h5 class="fw-bold text-primary mt-1 mb-0" id="statProductRevenue">Rp 0</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Baru: Rincian Kuantitas Item Terjual -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card p-3 bg-white shadow-sm border border-light">
+                                    <span class="text-muted small fw-bold mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Jumlah Item Terjual:</span>
+                                    <div id="rincianProdukGlobal" class="d-flex flex-wrap gap-2 text-secondary fs-6 fw-semibold">
+                                        <!-- Di-render oleh JavaScript -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -252,7 +264,7 @@
                                 <select id="inputFilterKaryawanYear" class="form-select form-select-sm d-none" onchange="renderKaryawanDashboard()"></select>
                             </div>
                         </div>
-                        <p class="text-muted small mb-4">Dashboard profil karyawan dan kalkulasi estimasi gaji (40% dari subtotal layanan) berdasarkan filter waktu yang dipilih.</p>
+                        <p class="text-muted small mb-4">Dashboard profil karyawan dan kalkulasi estimasi gaji. <br><b>Rumus:</b> (Subtotal Hasil Penjualan x 40%) - Catatan Kasbon.</p>
                         
                         <div class="row g-4">
                             <!-- BORDER EKA -->
@@ -261,24 +273,36 @@
                                     <h5 class="fw-bold text-primary border-bottom border-primary pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: Eka</h5>
                                     
                                     <div class="mb-2">
-                                        <label class="form-label small fw-bold text-secondary mb-1">Umur (Bisa Diedit Manual)</label>
-                                        <input type="text" class="form-control form-control-sm" placeholder="Contoh: 25 Tahun">
+                                        <label class="form-label small fw-bold text-secondary mb-0">Umur</label>
+                                        <p class="mb-2 fw-semibold">25 Tahun</p>
                                     </div>
-                                    <div class="mb-4">
-                                        <label class="form-label small fw-bold text-secondary mb-1">Alamat (Bisa Diedit Manual)</label>
-                                        <textarea class="form-control form-control-sm" rows="2" placeholder="Ketikkan alamat di sini..."></textarea>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-secondary mb-0">Alamat</label>
+                                        <p class="mb-2 fw-semibold">Jl. Pahlawan No. 1</p>
+                                    </div>
+
+                                    <div class="mb-3 p-2 bg-light border rounded">
+                                        <label class="form-label small fw-bold text-secondary mb-1"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
+                                        <div id="rincianLayananEka" class="small fw-semibold text-primary" style="line-height: 1.6; word-break: break-word;">
+                                            <!-- Rendered by JS -->
+                                        </div>
                                     </div>
                                     
-                                    <div class="p-3 bg-white border rounded shadow-sm">
+                                    <div class="p-3 bg-white border rounded shadow-sm mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-semibold text-muted small">Subtotal Penjualan (Kotor):</span>
+                                            <span class="fw-bold text-dark" id="totalLayananEka">Rp 0</span>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="fw-semibold text-muted small">Total Hasil Layanan Eka:</span>
-                                            <span class="fw-bold text-dark fs-5" id="totalLayananEka">Rp 0</span>
+                                            <span class="fw-semibold text-muted small">Total Kasbon (Pengeluaran):</span>
+                                            <span class="fw-bold text-danger" id="kasbonEka">- Rp 0</span>
                                         </div>
                                         <hr class="my-2 text-muted">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-primary">Estimasi Gaji (40%):</span>
+                                            <span class="fw-bold text-primary">Estimasi Gaji Bersih:</span>
                                             <span class="fw-bold text-success fs-5" id="gajiEka">Rp 0</span>
                                         </div>
+                                        <div class="text-end text-muted mt-1" style="font-size: 0.65rem;">*(Subtotal Kotor x 40%) - Kasbon</div>
                                     </div>
                                 </div>
                             </div>
@@ -289,24 +313,36 @@
                                     <h5 class="fw-bold text-info border-bottom border-info pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: Hudan</h5>
                                     
                                     <div class="mb-2">
-                                        <label class="form-label small fw-bold text-secondary mb-1">Umur (Bisa Diedit Manual)</label>
-                                        <input type="text" class="form-control form-control-sm" placeholder="Contoh: 24 Tahun">
+                                        <label class="form-label small fw-bold text-secondary mb-0">Umur</label>
+                                        <p class="mb-2 fw-semibold">20 Tahun</p>
                                     </div>
-                                    <div class="mb-4">
-                                        <label class="form-label small fw-bold text-secondary mb-1">Alamat (Bisa Diedit Manual)</label>
-                                        <textarea class="form-control form-control-sm" rows="2" placeholder="Ketikkan alamat di sini..."></textarea>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-secondary mb-0">Alamat</label>
+                                        <p class="mb-2 fw-semibold">Jl. Kusuma No. 1</p>
                                     </div>
                                     
-                                    <div class="p-3 bg-white border rounded shadow-sm">
+                                    <div class="mb-3 p-2 bg-light border rounded">
+                                        <label class="form-label small fw-bold text-secondary mb-1"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
+                                        <div id="rincianLayananHudan" class="small fw-semibold text-info" style="line-height: 1.6; word-break: break-word;">
+                                            <!-- Rendered by JS -->
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 bg-white border rounded shadow-sm mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-semibold text-muted small">Subtotal Penjualan (Kotor):</span>
+                                            <span class="fw-bold text-dark" id="totalLayananHudan">Rp 0</span>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="fw-semibold text-muted small">Total Hasil Layanan Hudan:</span>
-                                            <span class="fw-bold text-dark fs-5" id="totalLayananHudan">Rp 0</span>
+                                            <span class="fw-semibold text-muted small">Total Kasbon (Pengeluaran):</span>
+                                            <span class="fw-bold text-danger" id="kasbonHudan">- Rp 0</span>
                                         </div>
                                         <hr class="my-2 text-muted">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-info">Estimasi Gaji (40%):</span>
+                                            <span class="fw-bold text-info">Estimasi Gaji Bersih:</span>
                                             <span class="fw-bold text-success fs-5" id="gajiHudan">Rp 0</span>
                                         </div>
+                                        <div class="text-end text-muted mt-1" style="font-size: 0.65rem;">*(Subtotal Kotor x 40%) - Kasbon</div>
                                     </div>
                                 </div>
                             </div>
@@ -379,7 +415,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Keterangan</label>
-                            <input type="text" id="ketPengeluaran" class="form-control" placeholder="Contoh: Kasbon / Beli Token Listrik">
+                            <input type="text" id="ketPengeluaran" class="form-control" placeholder="Contoh: pengeluaran kasbon eka / kasbon hudan / Token Listrik">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nominal (Rp)</label>
@@ -618,7 +654,7 @@
                 globalData = result.data;
                 renderDashboard();
                 renderProductChart();
-                renderKaryawanDashboard(); // Eksekusi update dashboard Karyawan
+                renderKaryawanDashboard(); 
                 renderHistory();
                 showToast("Data berhasil diperbarui!", "success");
             } else {
@@ -1025,9 +1061,20 @@
             totalRevenueProduk += subtotal;
         });
 
-        // Tampilkan ke dalam Card Stat
+        // Tampilkan ke dalam Card Stat & Global Details
         document.getElementById('statProductQty').innerText = `${totalQtyTerjual} Item`;
         document.getElementById('statProductRevenue').innerText = `Rp ${totalRevenueProduk.toLocaleString('id-ID')}`;
+
+        let rincianGlobalHtml = '';
+        URUTAN_MENU.forEach(m => {
+            let qty = qtyMap[m.toLowerCase()] || 0;
+            if(qty > 0 || true) {
+                // Menampilkan format misalnya: keren eka 150
+                rincianGlobalHtml += `<span>${m.replace('-', ' ')} ${qty}</span> &nbsp;&bull;&nbsp; `;
+            }
+        });
+        // Hilangkan titik bullet terakhir
+        document.getElementById('rincianProdukGlobal').innerHTML = rincianGlobalHtml.slice(0, -21); 
 
         let labels = URUTAN_MENU.map(m => m.replace('-', ' '));
         let dataQty = URUTAN_MENU.map(m => qtyMap[m.toLowerCase()]);
@@ -1097,8 +1144,16 @@
         const filterMonth = document.getElementById('inputFilterKaryawanMonth').value;
         const filterYear = document.getElementById('inputFilterKaryawanYear').value;
 
-        // Filter Penjualan
+        // Filter Penjualan dan Pengeluaran sesuai Waktu
         let filteredPenjualan = globalData.penjualan.filter(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if(mode === 'date') return tgl === filterDate;
+            if(mode === 'month') return tgl.startsWith(filterMonth);
+            if(mode === 'year') return tgl.startsWith(filterYear);
+            return true;
+        });
+        
+        let filteredPengeluaran = globalData.pengeluaran.filter(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if(mode === 'date') return tgl === filterDate;
             if(mode === 'month') return tgl.startsWith(filterMonth);
@@ -1108,27 +1163,58 @@
 
         let totalLayananEka = 0;
         let totalLayananHudan = 0;
+        
+        // Objek inisiasi item agar hasil 0 tetap muncul sesuai permintaan
+        let itemEka = { 'keren-eka': 0, 'ganteng-eka': 0, 'elegan-eka': 0, 'anak-eka': 0, 'ayahanak-eka': 0, 'jenggot-eka': 0 };
+        let itemHudan = { 'keren-hudan': 0, 'ganteng-hudan': 0, 'elegan-hudan': 0, 'anak-hudan': 0, 'ayahanak-hudan': 0, 'jenggot-hudan': 0 };
 
         filteredPenjualan.forEach(r => {
             let itemName = String(r.item).toLowerCase();
             let subtotal = Number(r.subtotal || 0);
+            let qty = Number(r.qty || 0);
 
             if (itemName.includes('eka')) {
                 totalLayananEka += subtotal;
+                if(itemEka[itemName] !== undefined) itemEka[itemName] += qty;
             } else if (itemName.includes('hudan')) {
                 totalLayananHudan += subtotal;
+                if(itemHudan[itemName] !== undefined) itemHudan[itemName] += qty;
             }
         });
 
-        // Kalkulasi 40% Gaji Karyawan
-        let gajiEka = totalLayananEka * 0.40;
-        let gajiHudan = totalLayananHudan * 0.40;
+        // Filter Kasbon dari Pengeluaran
+        let kasbonEka = 0;
+        let kasbonHudan = 0;
+        filteredPengeluaran.forEach(r => {
+            let ket = String(r.keterangan || '').toLowerCase();
+            let nom = Number(r.nominal || 0);
+            
+            if(ket.includes('kasbon eka')) {
+                kasbonEka += nom;
+            } else if(ket.includes('kasbon hudan')) {
+                kasbonHudan += nom;
+            }
+        });
 
-        // Masukkan ke DOM
+        // Rangkai Teks Penjualan sesuai Permintaan (tanpa spasi antara item dan qty)
+        let rincianEkaStr = Object.keys(itemEka).map(k => `${k}${itemEka[k]}`).join(' ');
+        let rincianHudanStr = Object.keys(itemHudan).map(k => `${k}${itemHudan[k]}`).join(' ');
+
+        document.getElementById('rincianLayananEka').innerText = rincianEkaStr;
+        document.getElementById('rincianLayananHudan').innerText = rincianHudanStr;
+
+        // Kalkulasi 40% Gaji Karyawan dikurangi Kasbon
+        let gajiEka = (totalLayananEka * 0.40) - kasbonEka;
+        let gajiHudan = (totalLayananHudan * 0.40) - kasbonHudan;
+
+        // Update DOM EKA
         document.getElementById('totalLayananEka').innerText = `Rp ${totalLayananEka.toLocaleString('id-ID')}`;
+        document.getElementById('kasbonEka').innerText = `- Rp ${kasbonEka.toLocaleString('id-ID')}`;
         document.getElementById('gajiEka').innerText = `Rp ${gajiEka.toLocaleString('id-ID')}`;
 
+        // Update DOM HUDAN
         document.getElementById('totalLayananHudan').innerText = `Rp ${totalLayananHudan.toLocaleString('id-ID')}`;
+        document.getElementById('kasbonHudan').innerText = `- Rp ${kasbonHudan.toLocaleString('id-ID')}`;
         document.getElementById('gajiHudan').innerText = `Rp ${gajiHudan.toLocaleString('id-ID')}`;
     }
 
