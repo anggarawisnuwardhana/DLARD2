@@ -214,9 +214,9 @@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <div class="card p-3 bg-white shadow-sm border border-light">
-                                    <span class="text-muted small fw-bold mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Jumlah Item Terjual:</span>
-                                    <div id="rincianProdukGlobal" class="d-flex flex-wrap gap-2 text-secondary fs-6 fw-semibold">
-                                        <!-- Di-render oleh JavaScript -->
+                                    <span class="text-muted small fw-bold mb-3 d-block"><i class="fa-solid fa-list me-1"></i> Rincian Jumlah Item Terjual:</span>
+                                    <div id="rincianProdukGlobal" class="d-flex flex-wrap gap-2 text-secondary">
+                                        <!-- Di-render oleh JavaScript dengan tampilan Badge rapi -->
                                     </div>
                                 </div>
                             </div>
@@ -281,9 +281,9 @@
                                         <p class="mb-2 fw-semibold">Jl. Pahlawan No. 1</p>
                                     </div>
 
-                                    <div class="mb-3 p-2 bg-light border rounded">
-                                        <label class="form-label small fw-bold text-secondary mb-1"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
-                                        <div id="rincianLayananEka" class="small fw-semibold text-primary" style="line-height: 1.6; word-break: break-word;">
+                                    <div class="mb-3 p-3 bg-light border border-primary-subtle rounded">
+                                        <label class="form-label small fw-bold text-primary mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
+                                        <div id="rincianLayananEka">
                                             <!-- Rendered by JS -->
                                         </div>
                                     </div>
@@ -321,9 +321,9 @@
                                         <p class="mb-2 fw-semibold">Jl. Kusuma No. 1</p>
                                     </div>
                                     
-                                    <div class="mb-3 p-2 bg-light border rounded">
-                                        <label class="form-label small fw-bold text-secondary mb-1"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
-                                        <div id="rincianLayananHudan" class="small fw-semibold text-info" style="line-height: 1.6; word-break: break-word;">
+                                    <div class="mb-3 p-3 bg-light border border-info-subtle rounded">
+                                        <label class="form-label small fw-bold text-info mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
+                                        <div id="rincianLayananHudan">
                                             <!-- Rendered by JS -->
                                         </div>
                                     </div>
@@ -555,6 +555,11 @@
     let mainChartInstance = null;
     let productChartInstance = null;
     let productRevenueChartInstance = null;
+
+    // Helper: Mengubah string menjadi Format Kapital di Awal Kata (Contoh: Keren Eka)
+    function toTitleCase(str) {
+        return str.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date().toISOString().split('T')[0];
@@ -822,8 +827,9 @@
             dayPenjualan.forEach(p => {
                 let sub = Number(p.subtotal || 0);
                 totalPenj += sub;
+                let itemName = toTitleCase(String(p.item));
                 bodyHtml += `<tr>
-                    <td class="text-capitalize">${String(p.item).replace('-', ' ')}</td>
+                    <td class="text-capitalize">${itemName}</td>
                     <td class="text-center">${p.qty}</td>
                     <td class="text-end">Rp ${sub.toLocaleString('id-ID')}</td>
                 </tr>`;
@@ -1065,18 +1071,18 @@
         document.getElementById('statProductQty').innerText = `${totalQtyTerjual} Item`;
         document.getElementById('statProductRevenue').innerText = `Rp ${totalRevenueProduk.toLocaleString('id-ID')}`;
 
+        // Bikin Rincian dengan format Kapital menggunakan helpers (toTitleCase) dan box rapi (Badges)
         let rincianGlobalHtml = '';
         URUTAN_MENU.forEach(m => {
             let qty = qtyMap[m.toLowerCase()] || 0;
-            if(qty > 0 || true) {
-                // Menampilkan format misalnya: keren eka 150
-                rincianGlobalHtml += `<span>${m.replace('-', ' ')} ${qty}</span> &nbsp;&bull;&nbsp; `;
-            }
+            let titleName = toTitleCase(m);
+            rincianGlobalHtml += `<span class="badge bg-light text-secondary border px-3 py-2" style="font-size: 0.85rem; font-weight: 500;">
+                                    ${titleName} : <strong class="text-dark fs-6">${qty}</strong>
+                                  </span>`;
         });
-        // Hilangkan titik bullet terakhir
-        document.getElementById('rincianProdukGlobal').innerHTML = rincianGlobalHtml.slice(0, -21); 
+        document.getElementById('rincianProdukGlobal').innerHTML = rincianGlobalHtml;
 
-        let labels = URUTAN_MENU.map(m => m.replace('-', ' '));
+        let labels = URUTAN_MENU.map(m => toTitleCase(m));
         let dataQty = URUTAN_MENU.map(m => qtyMap[m.toLowerCase()]);
         let dataRev = URUTAN_MENU.map(m => revMap[m.toLowerCase()]);
 
@@ -1196,12 +1202,26 @@
             }
         });
 
-        // Rangkai Teks Penjualan sesuai Permintaan (tanpa spasi antara item dan qty)
-        let rincianEkaStr = Object.keys(itemEka).map(k => `${k}${itemEka[k]}`).join(' ');
-        let rincianHudanStr = Object.keys(itemHudan).map(k => `${k}${itemHudan[k]}`).join(' ');
+        // Fungsi Helper untuk merender list item karyawan menjadi kolom grid rapi (tidak semrawut)
+        const buildRincianKaryawan = (itemMap, colorClass) => {
+            let html = '<div class="row g-2">';
+            Object.keys(itemMap).forEach(k => {
+                let titleName = toTitleCase(k);
+                let qty = itemMap[k];
+                html += `<div class="col-6">
+                            <div class="d-flex justify-content-between align-items-center bg-white border border-${colorClass} rounded px-2 py-1 shadow-sm">
+                                <span class="text-secondary small fw-semibold">${titleName}</span>
+                                <span class="badge bg-${colorClass}">${qty}</span>
+                            </div>
+                         </div>`;
+            });
+            html += '</div>';
+            return html;
+        };
 
-        document.getElementById('rincianLayananEka').innerText = rincianEkaStr;
-        document.getElementById('rincianLayananHudan').innerText = rincianHudanStr;
+        // Render struktur list Karyawan ke DOM
+        document.getElementById('rincianLayananEka').innerHTML = buildRincianKaryawan(itemEka, 'primary');
+        document.getElementById('rincianLayananHudan').innerHTML = buildRincianKaryawan(itemHudan, 'info');
 
         // Kalkulasi 40% Gaji Karyawan dikurangi Kasbon
         let gajiEka = (totalLayananEka * 0.40) - kasbonEka;
@@ -1237,7 +1257,8 @@
         let total = 0;
         items.forEach(i => {
             total += i.subtotal;
-            summaryHtml += `<div class="d-flex justify-content-between mb-1 text-dark"><span>${i.nama.replace('-', ' ')} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
+            let itemName = toTitleCase(i.nama);
+            summaryHtml += `<div class="d-flex justify-content-between mb-1 text-dark"><span>${itemName} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
         });
 
         document.getElementById('checkoutSummaryList').innerHTML = summaryHtml;
