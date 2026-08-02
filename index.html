@@ -213,10 +213,10 @@
                         <!-- Card Baru: Rincian Kuantitas Item Terjual -->
                         <div class="row mb-4">
                             <div class="col-12">
-                                <div class="card p-3 bg-white shadow-sm border border-light">
-                                    <span class="text-muted small fw-bold mb-3 d-block"><i class="fa-solid fa-list me-1"></i> Rincian Jumlah Item Terjual:</span>
-                                    <div id="rincianProdukGlobal" class="d-flex flex-wrap gap-2 text-secondary">
-                                        <!-- Di-render oleh JavaScript dengan tampilan Badge rapi -->
+                                <div class="p-3 bg-light border rounded shadow-sm">
+                                    <span class="text-secondary small fw-bold mb-3 d-block"><i class="fa-solid fa-list me-1"></i> Rincian Jumlah Item Terjual (Global):</span>
+                                    <div id="rincianProdukGlobal">
+                                        <!-- Di-render oleh JavaScript dengan tampilan grid rapi -->
                                     </div>
                                 </div>
                             </div>
@@ -318,7 +318,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label small fw-bold text-secondary mb-0">Alamat</label>
-                                        <p class="mb-2 fw-semibold">Jl. Kusuma No. 1</p>
+                                        <p class="mb-2 fw-semibold">PERUM. BLURU PERMAI FP-01, SIDOARJO</p>
                                     </div>
                                     
                                     <div class="mb-3 p-3 bg-light border border-info-subtle rounded">
@@ -1071,15 +1071,22 @@
         document.getElementById('statProductQty').innerText = `${totalQtyTerjual} Item`;
         document.getElementById('statProductRevenue').innerText = `Rp ${totalRevenueProduk.toLocaleString('id-ID')}`;
 
-        // Bikin Rincian dengan format Kapital menggunakan helpers (toTitleCase) dan box rapi (Badges)
-        let rincianGlobalHtml = '';
+        // Bikin Rincian bergaya visual grid (sama seperti analisis karyawan)
+        let rincianGlobalHtml = '<div class="row g-2">';
         URUTAN_MENU.forEach(m => {
             let qty = qtyMap[m.toLowerCase()] || 0;
             let titleName = toTitleCase(m);
-            rincianGlobalHtml += `<span class="badge bg-light text-secondary border px-3 py-2" style="font-size: 0.85rem; font-weight: 500;">
-                                    ${titleName} : <strong class="text-dark fs-6">${qty}</strong>
-                                  </span>`;
+            // Gunakan warna primary untuk eka, info untuk hudan (agar konsisten dengan chart dan karyawan)
+            let colorClass = m.toLowerCase().includes('eka') ? 'primary' : 'info';
+            
+            rincianGlobalHtml += `<div class="col-6 col-md-4 col-lg-3">
+                                    <div class="d-flex justify-content-between align-items-center bg-white border border-${colorClass} rounded px-2 py-2 shadow-sm">
+                                        <span class="text-secondary small fw-semibold">${titleName}</span>
+                                        <span class="badge bg-${colorClass}">${qty}</span>
+                                    </div>
+                                  </div>`;
         });
+        rincianGlobalHtml += '</div>';
         document.getElementById('rincianProdukGlobal').innerHTML = rincianGlobalHtml;
 
         let labels = URUTAN_MENU.map(m => toTitleCase(m));
