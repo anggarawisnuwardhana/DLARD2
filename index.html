@@ -297,6 +297,10 @@
                                             <span class="fw-semibold text-muted small">Subtotal Penjualan (Kotor):</span>
                                             <span class="fw-bold text-dark" id="totalLayananEka">Rp 0</span>
                                         </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-semibold text-muted small">Estimasi Subtotal Gaji : <br><span style="font-size: 0.65rem;">(subtotal kotor x40%)</span></span>
+                                            <span class="fw-bold text-primary" id="estimasiSubtotalEka">Rp 0</span>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="fw-semibold text-muted small">Total Kasbon (Pengeluaran):</span>
                                             <span class="fw-bold text-danger" id="kasbonEka">- Rp 0</span>
@@ -306,7 +310,6 @@
                                             <span class="fw-bold text-primary">Estimasi Gaji Bersih:</span>
                                             <span class="fw-bold text-success fs-5" id="gajiEka">Rp 0</span>
                                         </div>
-                                        <div class="text-end text-muted mt-1" style="font-size: 0.65rem;">*(Subtotal Kotor x 40%) - Kasbon</div>
                                     </div>
                                 </div>
                             </div>
@@ -334,6 +337,10 @@
                                             <span class="fw-semibold text-muted small">Subtotal Penjualan (Kotor):</span>
                                             <span class="fw-bold text-dark" id="totalLayananHudan">Rp 0</span>
                                         </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-semibold text-muted small">Estimasi Subtotal Gaji : <br><span style="font-size: 0.65rem;">(subtotal kotor x40%)</span></span>
+                                            <span class="fw-bold text-info" id="estimasiSubtotalHudan">Rp 0</span>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="fw-semibold text-muted small">Total Kasbon (Pengeluaran):</span>
                                             <span class="fw-bold text-danger" id="kasbonHudan">- Rp 0</span>
@@ -343,7 +350,6 @@
                                             <span class="fw-bold text-info">Estimasi Gaji Bersih:</span>
                                             <span class="fw-bold text-success fs-5" id="gajiHudan">Rp 0</span>
                                         </div>
-                                        <div class="text-end text-muted mt-1" style="font-size: 0.65rem;">*(Subtotal Kotor x 40%) - Kasbon</div>
                                     </div>
                                 </div>
                             </div>
@@ -391,11 +397,11 @@
                         
                         <div class="row g-2 mb-2">
                             <div class="col-7">
-                                <label class="form-label fw-semibold small text-muted">Keterangan 1</label>
+                                <label class="form-label fw-semibold small text-muted">Keterangan</label>
                                 <input type="text" id="ketPemasukan_1" class="form-control" placeholder="Contoh: Pembelian Pomade DLARD 100gr">
                             </div>
                             <div class="col-5">
-                                <label class="form-label fw-semibold small text-muted">Nominal 1 (Rp)</label>
+                                <label class="form-label fw-semibold small text-muted">Nominal (Rp)</label>
                                 <input type="number" id="nomPemasukan_1" class="form-control" placeholder="0" min="1">
                             </div>
                         </div>
@@ -433,11 +439,11 @@
                         
                         <div class="row g-2 mb-2">
                             <div class="col-7">
-                                <label class="form-label fw-semibold small text-muted">Keterangan 1</label>
+                                <label class="form-label fw-semibold small text-muted">Keterangan</label>
                                 <input type="text" id="ketPengeluaran_1" class="form-control" placeholder="Contoh: Token Listrik">
                             </div>
                             <div class="col-5">
-                                <label class="form-label fw-semibold small text-muted">Nominal 1 (Rp)</label>
+                                <label class="form-label fw-semibold small text-muted">Nominal (Rp)</label>
                                 <input type="number" id="nomPengeluaran_1" class="form-control" placeholder="0" min="1">
                             </div>
                         </div>
@@ -510,14 +516,8 @@
                         <hr class="text-muted">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-5">
-                                <label class="form-label fw-semibold">Filter Waktu Rekap</label>
-                                <select id="filterLaporanMode" class="form-select mb-2" onchange="updateLaporanFilterUI()">
-                                    <option value="month">Per Bulan</option>
-                                    <option value="year">Per Tahun</option>
-                                    <option value="all">Seluruh Waktu</option>
-                                </select>
+                                <label class="form-label fw-semibold">Bulan Rekap</label>
                                 <input type="month" id="excelMonth" class="form-control">
-                                <select id="excelYear" class="form-select d-none"></select>
                             </div>
                             <div class="col-md-7">
                                 <button class="btn btn-success w-100 py-2 fw-bold shadow-sm btn-action" onclick="downloadExcelReportServer()">
@@ -761,8 +761,7 @@
             document.getElementById('inputFilterYear'), 
             document.getElementById('inputFilterProductYear'),
             document.getElementById('inputFilterKaryawanYear'),
-            document.getElementById('inputFilterHistoryYear'),
-            document.getElementById('excelYear')
+            document.getElementById('inputFilterHistoryYear')
         ];
         
         yearSelects.forEach(selectEl => {
@@ -1064,20 +1063,9 @@
     }
 
     function downloadExcelReportServer() {
-        let mode = document.getElementById('filterLaporanMode').value;
-        let payload = { action: "generate_rekap" };
-        if (mode === 'month') {
-            let val = document.getElementById('excelMonth').value;
-            if(!val) { showToast("Pilih bulan rekap!", "warning"); return; }
-            payload.month = val;
-        } else if (mode === 'year') {
-            let val = document.getElementById('excelYear').value;
-            if(!val) { showToast("Pilih tahun rekap!", "warning"); return; }
-            payload.year = val;
-        } else {
-            payload.all_time = true;
-        }
-        sendData(payload);
+        let val = document.getElementById('excelMonth').value;
+        if(!val) { showToast("Pilih bulan rekap!", "warning"); return; }
+        sendData({ action: "generate_rekap", month: val });
     }
 
     function updateHistoryFilterUI() {
@@ -1089,15 +1077,6 @@
         if(mode === 'year') document.getElementById('inputFilterHistoryYear').classList.remove('d-none');
 
         renderHistory();
-    }
-
-    function updateLaporanFilterUI() {
-        const mode = document.getElementById('filterLaporanMode').value;
-        document.getElementById('excelMonth').classList.add('d-none');
-        document.getElementById('excelYear').classList.add('d-none');
-
-        if(mode === 'month') document.getElementById('excelMonth').classList.remove('d-none');
-        if(mode === 'year') document.getElementById('excelYear').classList.remove('d-none');
     }
 
     function renderHistory() {
@@ -1720,14 +1699,19 @@
         document.getElementById('rincianLayananEka').innerHTML = buildRincianKaryawan(itemEka, 'primary');
         document.getElementById('rincianLayananHudan').innerHTML = buildRincianKaryawan(itemHudan, 'info');
 
-        let gajiEka = (totalLayananEka * 0.40) - kasbonEka;
-        let gajiHudan = (totalLayananHudan * 0.40) - kasbonHudan;
+        let estSubtotalEka = totalLayananEka * 0.40;
+        let gajiEka = estSubtotalEka - kasbonEka;
+        
+        let estSubtotalHudan = totalLayananHudan * 0.40;
+        let gajiHudan = estSubtotalHudan - kasbonHudan;
 
         document.getElementById('totalLayananEka').innerText = `Rp ${totalLayananEka.toLocaleString('id-ID')}`;
+        document.getElementById('estimasiSubtotalEka').innerText = `Rp ${estSubtotalEka.toLocaleString('id-ID')}`;
         document.getElementById('kasbonEka').innerText = `- Rp ${kasbonEka.toLocaleString('id-ID')}`;
         document.getElementById('gajiEka').innerText = `Rp ${gajiEka.toLocaleString('id-ID')}`;
 
         document.getElementById('totalLayananHudan').innerText = `Rp ${totalLayananHudan.toLocaleString('id-ID')}`;
+        document.getElementById('estimasiSubtotalHudan').innerText = `Rp ${estSubtotalHudan.toLocaleString('id-ID')}`;
         document.getElementById('kasbonHudan').innerText = `- Rp ${kasbonHudan.toLocaleString('id-ID')}`;
         document.getElementById('gajiHudan').innerText = `Rp ${gajiHudan.toLocaleString('id-ID')}`;
     }
