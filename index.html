@@ -544,6 +544,27 @@
     </div>
 </div>
 
+<!-- Modal Konfirmasi Duplikat Data (Penjualan / Pemasukan / Pengeluaran) -->
+<div class="modal fade" id="duplicateConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i> Konfirmasi Penginputan Ganda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2" id="duplicateConfirmText">Data dengan item/keterangan yang sama sudah pernah diinput pada tanggal tersebut.</p>
+                <div class="p-3 bg-light border rounded text-sm mb-3" id="duplicateConfirmDetails"></div>
+                <p class="text-muted small mb-0"><i class="fa-solid fa-circle-info me-1"></i> Apakah Anda ingin mengakumulasikannya ke dalam baris yang sama?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-warning px-4 fw-bold text-dark btn-action" id="btnExecuteDuplicate">Ya, Akumulasikan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -1459,17 +1480,47 @@
         const bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
         bootstrapModal.hide();
 
+        const inputTgl = document.getElementById('tglPenjualan').value;
         const items = [];
         Object.keys(MENU).forEach(item => {
             const qty = parseInt(document.getElementById(`qty-${item}`).value);
             if(qty > 0) items.push({ nama: item, qty: qty });
         });
 
-        sendData({
-            action: "input_penjualan",
-            tanggal: document.getElementById('tglPenjualan').value,
-            items: items
+        // Cek apakah ada item yang sama pada tanggal yang sama di data lokal
+        let duplicateItems = items.filter(newItem => {
+            return globalData.penjualan.some(existing => {
+                let existingTgl = String(existing.tanggal || '').split('T')[0];
+                return existingTgl === inputTgl && String(existing.item).toLowerCase() === newItem.nama.toLowerCase();
+            });
         });
+
+        if (duplicateItems.length > 0) {
+            let names = duplicateItems.map(d => toTitleCase(d.nama)).join(', ');
+            document.getElementById('duplicateConfirmText').innerText = `Item berikut sudah pernah diinput pada tanggal ${inputTgl}:`;
+            document.getElementById('duplicateConfirmDetails').innerHTML = `<b>${names}</b>`;
+            
+            const btnExec = document.getElementById('btnExecuteDuplicate');
+            // Ganti event listener agar menjalankan fungsi kirim data penjualan
+            btnExec.onclick = function() {
+                const dupModalEl = bootstrap.Modal.getInstance(document.getElementById('duplicateConfirmModal'));
+                dupModalEl.hide();
+                sendData({
+                    action: "input_penjualan",
+                    tanggal: inputTgl,
+                    items: items
+                });
+            };
+
+            const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+            dupModal.show();
+        } else {
+            sendData({
+                action: "input_penjualan",
+                tanggal: inputTgl,
+                items: items
+            });
+        }
     }
 
     function submitMulti(type) { 
@@ -1478,7 +1529,7 @@
         let items = [];
         
         for(let i=1; i<=3; i++) {
-            let ket = document.getElementById(`ket${toTitleCase(type)}_${i}`).value;
+            let ket = document.getElementById(`ket${toTitleCase(type)}_${i}`).value.trim();
             let nom = parseInt(document.getElementById(`nom${toTitleCase(type)}_${i}`).value);
             
             if(ket && !isNaN(nom) && nom > 0) {
@@ -1494,7 +1545,33 @@
             return;
         }
 
-        sendDataMulti(action, tgl, items, type);
+        // Cek duplikat keterangan pada tanggal yang sama untuk jenis (pemasukan/pengeluaran)
+        let dataListTarget = type === 'pemasukan' ? globalData.pemasukan : globalData.pengeluaran;
+        let duplicateItems = items.filter(newItem => {
+            return dataListTarget.some(existing => {
+                let existingTgl = String(existing.tanggal || '').split('T')[0];
+                let existingKet = String(existing.keterangan || '').trim().toLowerCase();
+                return existingTgl === tgl && existingKet === newItem.keterangan.toLowerCase();
+            });
+        });
+
+        if (duplicateItems.length > 0) {
+            let descList = duplicateItems.map(d => `"${d.keterangan}" (Rp ${d.nominal.toLocaleString('id-ID')})`).join('<br>');
+            document.getElementById('duplicateConfirmText').innerText = `Keterangan ${type} berikut sudah ada pada tanggal ${tgl}:`;
+            document.getElementById('duplicateConfirmDetails').innerHTML = descList;
+            
+            const btnExec = document.getElementById('btnExecuteDuplicate');
+            btnExec.onclick = function() {
+                const dupModalEl = bootstrap.Modal.getInstance(document.getElementById('duplicateConfirmModal'));
+                dupModalEl.hide();
+                sendDataMulti(action, tgl, items, type);
+            };
+
+            const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+            dupModal.show();
+        } else {
+            sendDataMulti(action, tgl, items, type);
+        }
     }
 
     function submitLibur() {
