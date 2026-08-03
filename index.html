@@ -122,6 +122,7 @@
         <div class="col-lg-9">
             <div class="tab-content" id="posTabsContent">
 
+                <!-- [DASHBOARD, ANALISIS PRODUK, ANALISIS KARYAWAN TABS - OMITTED FOR BREVITY BUT KEPT IN ACTUAL CODE] -->
                 <div class="tab-pane fade show active" id="dashboard">
                     <div class="card p-4 mb-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
@@ -485,8 +486,19 @@
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> History & Manajemen Data</h4>
                         <p class="text-muted small">Kelola riwayat input data (Penjualan, Pemasukan, Pengeluaran, Libur) per tanggal. Klik <b>Lihat Detail</b> untuk rincian, atau Hapus untuk mereset seluruh transaksi pada tanggal tersebut.</p>
-                        <hr class="text-muted mb-4">
                         
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <label class="fw-semibold text-muted fs-6">Filter Waktu:</label>
+                            <select id="filterHistoryMode" class="form-select form-select-sm w-auto" onchange="updateHistoryFilterUI()">
+                                <option value="all">Seluruh Waktu</option>
+                                <option value="month">Per Bulan</option>
+                                <option value="year">Per Tahun</option>
+                            </select>
+                            <input type="month" id="inputFilterHistoryMonth" class="form-control form-control-sm w-auto d-none" onchange="renderHistory()">
+                            <select id="inputFilterHistoryYear" class="form-select form-select-sm w-auto d-none" onchange="renderHistory()"></select>
+                        </div>
+                        
+                        <hr class="text-muted mb-4">
                         <div id="historyContainer"></div>
                     </div>
                 </div>
@@ -494,12 +506,18 @@
                 <div class="tab-pane fade" id="laporan">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-excel text-success me-2"></i> Export & Download Laporan Excel</h4>
-                        <p class="text-muted">Generate & Download rekapitulasi data harian lengkap dengan rincian item, pengeluaran, dan total penghasilan bersih. Sistem akan membuat Sheet baru berdasarkan rekapitulasi bulan yang anda pilih.</p>
+                        <p class="text-muted">Generate & Download rekapitulasi data harian lengkap dengan rincian item, pengeluaran, dan total penghasilan bersih.</p>
                         <hr class="text-muted">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-5">
-                                <label class="form-label fw-semibold">Pilih Bulan Rekap</label>
+                                <label class="form-label fw-semibold">Filter Waktu Rekap</label>
+                                <select id="filterLaporanMode" class="form-select mb-2" onchange="updateLaporanFilterUI()">
+                                    <option value="month">Per Bulan</option>
+                                    <option value="year">Per Tahun</option>
+                                    <option value="all">Seluruh Waktu</option>
+                                </select>
                                 <input type="month" id="excelMonth" class="form-control">
+                                <select id="excelYear" class="form-select d-none"></select>
                             </div>
                             <div class="col-md-7">
                                 <button class="btn btn-success w-100 py-2 fw-bold shadow-sm btn-action" onclick="downloadExcelReportServer()">
@@ -533,17 +551,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-2" id="duplicateConfirmText">Data serupa sudah diinput pada tanggal yang sama. Apakah Anda ingin mengakumulasikannya?</p>
-                <div class="p-3 bg-light border rounded text-sm mb-3" id="duplicateConfirmSummary"></div>
+                <p class="mb-2" id="duplicateConfirmText">Terdapat data pada tanggal yang sama. Apakah Anda ingin mengakumulasikannya?</p>
+                <h6 class="fw-bold text-secondary small">Data Sudah Terinput:</h6>
+                <div class="p-2 bg-light border rounded text-sm mb-2" id="duplicateOldData" style="max-height: 150px; overflow-y: auto;"></div>
+                <h6 class="fw-bold text-primary small">Data Akan Diinput:</h6>
+                <div class="p-2 bg-white border border-primary rounded text-sm mb-3" id="duplicateNewData" style="max-height: 150px; overflow-y: auto;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-warning px-4 fw-bold text-dark btn-action" id="duplicateConfirmBtn">Ya, Akumulasikan</button>
+                <button type="button" class="btn btn-warning px-4 fw-bold text-dark btn-action" id="duplicateConfirmBtn">Ya, Lanjutkan Input</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal Checkout Biru untuk Penjualan -->
 <div class="modal fade" id="checkoutModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -558,12 +580,34 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary px-4 fw-bold btn-action" onclick="executeSubmitPenjualan()">Ya, Simpan Transaksi</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold btn-action" id="checkoutSubmitBtn">Ya, Simpan Transaksi</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal Checkout Dinamis untuk Pemasukan / Pengeluaran -->
+<div class="modal fade" id="checkoutMultiModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white" id="checkoutMultiHeader">
+                <h5 class="modal-title fw-bold" id="checkoutMultiTitleText"><i class="fa-solid fa-file-invoice me-2"></i> Konfirmasi Data</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-2">Item yang akan disimpan:</p>
+                <div id="checkoutMultiList" class="border rounded p-3 bg-light mb-3" style="max-height: 200px; overflow-y: auto;"></div>
+                <h5 class="fw-bold text-end text-primary" id="checkoutMultiTotal">Total: Rp 0</h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn px-4 fw-bold btn-action" id="checkoutMultiSubmitBtn">Ya, Simpan Transaksi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals Detail & Hapus (Tetap) -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -643,6 +687,7 @@
         document.getElementById('inputFilterMonth').value = today.slice(0, 7); 
         document.getElementById('inputFilterProductMonth').value = today.slice(0, 7); 
         document.getElementById('inputFilterKaryawanMonth').value = today.slice(0, 7); 
+        document.getElementById('inputFilterHistoryMonth').value = today.slice(0, 7); 
 
         initMenuCards();
         populateYearDropdowns();
@@ -715,7 +760,9 @@
         const yearSelects = [
             document.getElementById('inputFilterYear'), 
             document.getElementById('inputFilterProductYear'),
-            document.getElementById('inputFilterKaryawanYear')
+            document.getElementById('inputFilterKaryawanYear'),
+            document.getElementById('inputFilterHistoryYear'),
+            document.getElementById('excelYear')
         ];
         
         yearSelects.forEach(selectEl => {
@@ -778,12 +825,6 @@
             return;
         }
 
-        // Cek apakah ada layanan yang sudah diinput di tanggal yang sama (untuk konfirmasi ulang akumulasi)
-        let existingItemsOnDate = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === tgl);
-        let hasDuplicate = itemsArray.some(newItem => 
-            existingItemsOnDate.some(ex => String(ex.item).toLowerCase() === newItem.nama.toLowerCase())
-        );
-
         let listHtml = '<ul class="list-group list-group-flush">';
         itemsArray.forEach(i => {
             listHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
@@ -793,38 +834,64 @@
         });
         listHtml += '</ul>';
 
-        if(hasDuplicate) {
-            document.getElementById('duplicateConfirmText').innerHTML = `Beberapa layanan tersebut sudah pernah diinput pada tanggal <b>${tgl}</b>. Apakah Anda ingin mengakumulasikannya ke baris yang sama?`;
-            document.getElementById('duplicateConfirmSummary').innerHTML = listHtml;
+        document.getElementById('checkoutSummaryList').innerHTML = listHtml;
+        document.getElementById('checkoutTotalModal').innerText = `Total: Rp ${totalModal.toLocaleString('id-ID')}`;
+
+        const submitBtn = document.getElementById('checkoutSubmitBtn');
+        let newBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+        newBtn.addEventListener('click', () => {
+            const modalEl = document.getElementById('checkoutModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if(modal) modal.hide();
+
+            let existingItemsOnDate = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === tgl);
             
-            const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
-            dupModal.show();
-
-            document.getElementById('duplicateConfirmBtn').onclick = () => {
-                dupModal.hide();
-                executeSubmitPenjualan();
-            };
-        } else {
-            document.getElementById('checkoutSummaryList').innerHTML = listHtml;
-            document.getElementById('checkoutTotalModal').innerText = `Total: Rp ${totalModal.toLocaleString('id-ID')}`;
-
-            const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
-            modal.show();
-        }
-    }
-
-    function executeSubmitPenjualan() {
-        const modalEl = document.getElementById('checkoutModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        if(modal) modal.hide();
-
-        const tgl = document.getElementById('tglPenjualan').value;
-        let itemsArray = [];
-        Object.keys(MENU).forEach(item => {
-            const qty = parseInt(document.getElementById(`qty-${item}`).value) || 0;
-            if (qty > 0) itemsArray.push({ nama: item, qty: qty });
+            if(existingItemsOnDate.length > 0) {
+                let oldHtml = '<ul class="list-group list-group-flush">';
+                existingItemsOnDate.forEach(ex => {
+                    let itemName = String(ex.item || '').replace('-', ' ');
+                    let sub = Number(ex.subtotal || 0);
+                    oldHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
+                        <span class="text-capitalize">${itemName} (x${ex.qty})</span>
+                        <span class="fw-bold">Rp ${sub.toLocaleString('id-ID')}</span>
+                    </li>`;
+                });
+                oldHtml += '</ul>';
+                
+                document.getElementById('duplicateConfirmText').innerHTML = `Terdapat data Penjualan pada tanggal <b>${tgl}</b>. Apakah Anda ingin mengakumulasikannya?`;
+                document.getElementById('duplicateOldData').innerHTML = oldHtml;
+                document.getElementById('duplicateNewData').innerHTML = listHtml;
+                
+                const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+                dupModal.show();
+                
+                const dupBtn = document.getElementById('duplicateConfirmBtn');
+                let newDupBtn = dupBtn.cloneNode(true);
+                dupBtn.parentNode.replaceChild(newDupBtn, dupBtn);
+                newDupBtn.addEventListener('click', () => {
+                    dupModal.hide();
+                    executeSubmitPenjualan(tgl, itemsArray);
+                });
+            } else {
+                executeSubmitPenjualan(tgl, itemsArray);
+            }
         });
 
+        const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+        modal.show();
+    }
+
+    function executeSubmitPenjualan(tgl_param, itemsArray_param) {
+        let tgl = tgl_param || document.getElementById('tglPenjualan').value;
+        let itemsArray = itemsArray_param;
+        if (!itemsArray) {
+            itemsArray = [];
+            Object.keys(MENU).forEach(item => {
+                const qty = parseInt(document.getElementById(`qty-${item}`).value) || 0;
+                if (qty > 0) itemsArray.push({ nama: item, qty: qty });
+            });
+        }
         sendData({ action: "input_penjualan", tanggal: tgl, items: itemsArray });
     }
 
@@ -836,11 +903,13 @@
         }
 
         let items = [];
+        let totalModal = 0;
         for(let i=1; i<=3; i++) {
             let ket = document.getElementById(`ket${toTitleCase(type)}_${i}`).value.trim();
             let nom = parseFloat(document.getElementById(`nom${toTitleCase(type)}_${i}`).value) || 0;
             if(ket && nom > 0) {
                 items.push({ keterangan: ket, nominal: nom });
+                totalModal += nom;
             }
         }
 
@@ -849,35 +918,65 @@
             return;
         }
 
-        // Cek apakah ada keterangan yang sama di tanggal yang sama
-        let existingDataOnDate = globalData[type].filter(r => String(r.tanggal || '').split('T')[0] === tgl);
-        let hasDuplicate = items.some(newItem => 
-            existingDataOnDate.some(ex => String(ex.keterangan || '').toLowerCase().trim() === newItem.keterangan.toLowerCase().trim())
-        );
+        let listHtml = '<ul class="list-group list-group-flush">';
+        items.forEach(i => {
+            listHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
+                <span>${i.keterangan}</span>
+                <span class="fw-bold">Rp ${i.nominal.toLocaleString('id-ID')}</span>
+            </li>`;
+        });
+        listHtml += '</ul>';
 
-        if(hasDuplicate) {
-            let listHtml = '<ul class="list-group list-group-flush">';
-            items.forEach(i => {
-                listHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
-                    <span>${i.keterangan}</span>
-                    <span class="fw-bold">Rp ${i.nominal.toLocaleString('id-ID')}</span>
-                </li>`;
-            });
-            listHtml += '</ul>';
+        document.getElementById('checkoutMultiList').innerHTML = listHtml;
+        document.getElementById('checkoutMultiTotal').innerText = `Total: Rp ${totalModal.toLocaleString('id-ID')}`;
+        
+        let headerColor = type === 'pemasukan' ? 'bg-success' : 'bg-danger';
+        let typeText = toTitleCase(type);
+        document.getElementById('checkoutMultiHeader').className = `modal-header text-white ${headerColor}`;
+        document.getElementById('checkoutMultiTitleText').innerHTML = `<i class="fa-solid fa-file-invoice me-2"></i> Konfirmasi Data ${typeText}`;
+        document.getElementById('checkoutMultiSubmitBtn').className = `btn px-4 fw-bold btn-action ${type === 'pemasukan' ? 'btn-success' : 'btn-danger'}`;
 
-            document.getElementById('duplicateConfirmText').innerHTML = `Beberapa keterangan ${type} ini sudah ada pada tanggal <b>${tgl}</b>. Apakah Anda ingin mengakumulasikan nominalnya?`;
-            document.getElementById('duplicateConfirmSummary').innerHTML = listHtml;
+        const submitBtn = document.getElementById('checkoutMultiSubmitBtn');
+        let newBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+        newBtn.addEventListener('click', () => {
+            const modalEl = document.getElementById('checkoutMultiModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if(modal) modal.hide();
 
-            const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
-            dupModal.show();
-
-            document.getElementById('duplicateConfirmBtn').onclick = () => {
-                dupModal.hide();
+            let existingDataOnDate = globalData[type].filter(r => String(r.tanggal || '').split('T')[0] === tgl);
+            
+            if(existingDataOnDate.length > 0) {
+                let oldHtml = '<ul class="list-group list-group-flush">';
+                existingDataOnDate.forEach(ex => {
+                    oldHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
+                        <span>${ex.keterangan}</span>
+                        <span class="fw-bold">Rp ${Number(ex.nominal || 0).toLocaleString('id-ID')}</span>
+                    </li>`;
+                });
+                oldHtml += '</ul>';
+                
+                document.getElementById('duplicateConfirmText').innerHTML = `Terdapat data ${typeText} pada tanggal <b>${tgl}</b>. Apakah Anda ingin mengakumulasikannya?`;
+                document.getElementById('duplicateOldData').innerHTML = oldHtml;
+                document.getElementById('duplicateNewData').innerHTML = listHtml;
+                
+                const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+                dupModal.show();
+                
+                const dupBtn = document.getElementById('duplicateConfirmBtn');
+                let newDupBtn = dupBtn.cloneNode(true);
+                dupBtn.parentNode.replaceChild(newDupBtn, dupBtn);
+                newDupBtn.addEventListener('click', () => {
+                    dupModal.hide();
+                    sendDataMulti(`input_${type}`, tgl, items, type);
+                });
+            } else {
                 sendDataMulti(`input_${type}`, tgl, items, type);
-            };
-        } else {
-            sendDataMulti(`input_${type}`, tgl, items, type);
-        }
+            }
+        });
+
+        const modal = new bootstrap.Modal(document.getElementById('checkoutMultiModal'));
+        modal.show();
     }
 
     async function sendData(payload) {
@@ -965,12 +1064,40 @@
     }
 
     function downloadExcelReportServer() {
-        const monthVal = document.getElementById('excelMonth').value;
-        if(!monthVal) {
-            showToast("Pilih bulan rekap terlebih dahulu!", "warning");
-            return;
+        let mode = document.getElementById('filterLaporanMode').value;
+        let payload = { action: "generate_rekap" };
+        if (mode === 'month') {
+            let val = document.getElementById('excelMonth').value;
+            if(!val) { showToast("Pilih bulan rekap!", "warning"); return; }
+            payload.month = val;
+        } else if (mode === 'year') {
+            let val = document.getElementById('excelYear').value;
+            if(!val) { showToast("Pilih tahun rekap!", "warning"); return; }
+            payload.year = val;
+        } else {
+            payload.all_time = true;
         }
-        sendData({ action: "generate_rekap", month: monthVal });
+        sendData(payload);
+    }
+
+    function updateHistoryFilterUI() {
+        const mode = document.getElementById('filterHistoryMode').value;
+        document.getElementById('inputFilterHistoryMonth').classList.add('d-none');
+        document.getElementById('inputFilterHistoryYear').classList.add('d-none');
+
+        if(mode === 'month') document.getElementById('inputFilterHistoryMonth').classList.remove('d-none');
+        if(mode === 'year') document.getElementById('inputFilterHistoryYear').classList.remove('d-none');
+
+        renderHistory();
+    }
+
+    function updateLaporanFilterUI() {
+        const mode = document.getElementById('filterLaporanMode').value;
+        document.getElementById('excelMonth').classList.add('d-none');
+        document.getElementById('excelYear').classList.add('d-none');
+
+        if(mode === 'month') document.getElementById('excelMonth').classList.remove('d-none');
+        if(mode === 'year') document.getElementById('excelYear').classList.remove('d-none');
     }
 
     function renderHistory() {
@@ -1021,13 +1148,24 @@
         });
 
         let sortedDates = Object.keys(globalDatesMap).sort((a, b) => b.localeCompare(a));
+        
+        // Filter history dates
+        let mode = document.getElementById('filterHistoryMode').value;
+        let filterMonth = document.getElementById('inputFilterHistoryMonth').value;
+        let filterYear = document.getElementById('inputFilterHistoryYear').value;
 
-        if (sortedDates.length === 0) {
+        let filteredDates = sortedDates.filter(date => {
+            if(mode === 'month') return date.startsWith(filterMonth);
+            if(mode === 'year') return date.startsWith(filterYear);
+            return true;
+        });
+
+        if (filteredDates.length === 0) {
             historyContainer.innerHTML = '<div class="alert alert-secondary border-0"><i class="fa-solid fa-circle-info me-2"></i>Belum ada data transaksi yang tersimpan.</div>';
             return;
         }
 
-        sortedDates.forEach(date => {
+        filteredDates.forEach(date => {
             let dataTgl = globalDatesMap[date];
             let labaBersih = (dataTgl.totPenjualan + dataTgl.totPemasukan) - dataTgl.totPengeluaran;
             let classLaba = labaBersih >= 0 ? 'text-success' : 'text-danger';
@@ -1195,6 +1333,7 @@
         }
     }
 
+    // DASHBOARD & ANALYTICS RENDER FUNCTIONS (OMITTED FOR BREVITY BUT FULLY INTACT)
     function updateDashboardFilterUI() {
         const mode = document.getElementById('filterMode').value;
         document.getElementById('inputFilterDate').classList.add('d-none');
