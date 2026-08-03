@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,14 @@
             --accent-color: #3b82f6;
             --bg-body: #f8fafc;
         }
-        body { background-color: var(--bg-body); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #334155; }
+        
+        [data-bs-theme="dark"] {
+            --primary-color: #0d1117;
+            --accent-color: #3b82f6;
+            --bg-body: #161b22;
+        }
+
+        body { background-color: var(--bg-body); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s, color 0.3s; }
         
         /* Utility anti block text (disable selection) */
         .user-select-none {
@@ -40,19 +47,19 @@
             margin-bottom: 8px;
             transition: all 0.3s ease;
         }
-        .nav-pills .nav-link:hover { background-color: #e2e8f0; color: var(--primary-color); }
+        .nav-pills .nav-link:hover { background-color: var(--bs-secondary-bg); color: var(--bs-body-color); }
         .nav-pills .nav-link.active { background-color: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 
         /* Card Modern */
-        .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; background-color: var(--bs-body-bg); }
         
         /* Item Card Compact Version */
         .item-card { 
-            border: 1px solid #e2e8f0; 
+            border: 1px solid var(--bs-border-color); 
             border-radius: 8px; 
             padding: 10px; 
             text-align: center; 
-            background: white; 
+            background: var(--bs-body-bg); 
             cursor: pointer; 
             transition: all 0.2s; 
         }
@@ -61,15 +68,23 @@
         .item-card:hover { border-color: var(--accent-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
         .qty-btn { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; }
-        .qty-input { width: 40px; height: 28px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 6px; font-weight: 600; font-size: 14px;}
+        .qty-input { width: 40px; height: 28px; text-align: center; border: 1px solid var(--bs-border-color); border-radius: 6px; margin: 0 6px; font-weight: 600; font-size: 14px; background: var(--bs-body-bg); color: var(--bs-body-color);}
 
         /* Stat Cards */
         .stat-card { border-left: 4px solid var(--accent-color); }
+        
+        /* Tema Khusus (Custom Cards di Dark Mode) */
+        [data-bs-theme="dark"] .bg-white { background-color: #1e2329 !important; border-color: #30363d !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: #21262d !important; }
+        [data-bs-theme="dark"] .text-dark { color: #f0f6fc !important; }
+        [data-bs-theme="dark"] .text-secondary { color: #8b949e !important; }
+        [data-bs-theme="dark"] .text-muted { color: #8b949e !important; }
+        [data-bs-theme="dark"] #menuContainerEka .border-primary, [data-bs-theme="dark"] #menuContainerHudan .border-info { border-color: #30363d !important; background-color: #1e2329 !important; }
 
         /* Loading Spinner Fullscreen Overlay */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.8); z-index: 9999;
+            background: rgba(var(--bs-body-bg-rgb), 0.85); z-index: 9999;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
     </style>
@@ -79,14 +94,21 @@
 <!-- LOADING SPRAY OVERLAY -->
 <div id="loadingOverlay" class="d-none">
     <div class="spinner-border text-primary mb-2" role="status" style="width: 3rem; height: 3rem;"></div>
-    <h6 class="fw-bold text-dark" id="loadingText">Menghubungkan ke Server...</h6>
+    <h6 class="fw-bold" id="loadingText" style="color: var(--bs-body-color);">Menghubungkan ke Server...</h6>
 </div>
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-dark sticky-top">
     <div class="container-fluid px-4">
         <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-scissors me-2"></i>DLARD 2 BARBERSHOP</span>
-        <button class="btn btn-outline-light btn-sm fw-bold" onclick="fetchAllData()"><i class="fa-solid fa-rotate me-1"></i> Refresh Data</button>
+        <div class="d-flex align-items-center">
+            <!-- Toggle Dark Mode -->
+            <div class="form-check form-switch me-4">
+                <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" onchange="toggleTheme()">
+                <label class="form-check-label text-light" for="darkModeSwitch"><i class="fa-solid fa-moon"></i> Dark</label>
+            </div>
+            <button class="btn btn-outline-light btn-sm fw-bold btn-action" onclick="fetchAllData()"><i class="fa-solid fa-rotate me-1"></i> Refresh Data</button>
+        </div>
     </div>
 </nav>
 
@@ -103,7 +125,7 @@
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pemasukan"><i class="fa-solid fa-wallet me-2"></i> Pemasukan Dinamis</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#pengeluaran"><i class="fa-solid fa-receipt me-2"></i> Pengeluaran</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#libur"><i class="fa-solid fa-calendar-xmark me-2"></i> Pencatatan Libur</button>
-                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#history"><i class="fa-solid fa-clock-rotate-left me-2"></i> History & Manajemen Transaksi</button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#history"><i class="fa-solid fa-clock-rotate-left me-2"></i> History & Manajemen</button>
                     <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#laporan"><i class="fa-solid fa-file-excel me-2"></i> Export Laporan Excel</button>
                 </div>
             </div>
@@ -134,28 +156,36 @@
 
                         <!-- Stat Cards Grid -->
                         <div class="row g-3 mb-4">
-                            <div class="col-md-3">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4">
+                            <div class="col">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4 h-100">
                                     <span class="text-muted small fw-semibold">Total Penjualan</span>
-                                    <h5 class="fw-bold text-primary mt-1 mb-0" id="statPenjualan">Rp 0</h5>
+                                    <h6 class="fw-bold text-primary mt-1 mb-0 fs-5" id="statPenjualan">Rp 0</h6>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-success border-4">
+                            <div class="col">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-success border-4 h-100">
                                     <span class="text-muted small fw-semibold">Pemasukan Lain</span>
-                                    <h5 class="fw-bold text-success mt-1 mb-0" id="statPemasukan">Rp 0</h5>
+                                    <h6 class="fw-bold text-success mt-1 mb-0 fs-5" id="statPemasukan">Rp 0</h6>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-danger border-4">
+                            <div class="col">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-danger border-4 h-100">
                                     <span class="text-muted small fw-semibold">Total Pengeluaran</span>
-                                    <h5 class="fw-bold text-danger mt-1 mb-0" id="statPengeluaran">Rp 0</h5>
+                                    <h6 class="fw-bold text-danger mt-1 mb-0 fs-5" id="statPengeluaran">Rp 0</h6>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4">
+                            <div class="col">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4 h-100">
                                     <span class="text-muted small fw-semibold">Pendapatan Bersih</span>
-                                    <h5 class="fw-bold text-info mt-1 mb-0" id="statBersih">Rp 0</h5>
+                                    <h6 class="fw-bold text-info mt-1 mb-0 fs-5" id="statBersih">Rp 0</h6>
+                                </div>
+                            </div>
+                            <!-- Card Baru: Pertumbuhan Omzet -->
+                            <div class="col">
+                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-warning border-4 h-100">
+                                    <span class="text-muted small fw-semibold">Pertumbuhan Omzet</span>
+                                    <h6 class="fw-bold mt-1 mb-0 fs-5" id="statPertumbuhanValue">-</h6>
+                                    <div class="small fw-semibold mt-1" id="statPertumbuhanDesc" style="font-size: 0.7rem;">Pilih Filter Waktu</div>
                                 </div>
                             </div>
                         </div>
@@ -210,7 +240,7 @@
                             </div>
                         </div>
 
-                        <!-- Card Baru: Rincian Kuantitas Item Terjual -->
+                        <!-- Card Rincian Kuantitas Item Terjual -->
                         <div class="row mb-4">
                             <div class="col-12">
                                 <div class="p-3 bg-light border rounded shadow-sm">
@@ -269,7 +299,7 @@
                         <div class="row g-4">
                             <!-- BORDER EKA -->
                             <div class="col-md-6">
-                                <div class="card p-4 border border-primary border-2 shadow-sm h-100" style="background-color: #f8fbff;">
+                                <div class="card p-4 border border-primary border-2 shadow-sm h-100 bg-white">
                                     <h5 class="fw-bold text-primary border-bottom border-primary pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: EKA NUR BARIZA</h5>
                                     
                                     <div class="mb-2">
@@ -281,7 +311,7 @@
                                         <p class="mb-2 fw-semibold">DUSUN SIMADU TIMUR RT 07 / RW 08 , DESA BANYUMUDAL , PEMALANG</p>
                                     </div>
 
-                                    <div class="mb-3 p-3 bg-light border border-primary-subtle rounded">
+                                    <div class="mb-3 p-3 bg-light border rounded">
                                         <label class="form-label small fw-bold text-primary mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
                                         <div id="rincianLayananEka">
                                             <!-- Rendered by JS -->
@@ -309,7 +339,7 @@
                             
                             <!-- BORDER HUDAN -->
                             <div class="col-md-6">
-                                <div class="card p-4 border border-info border-2 shadow-sm h-100" style="background-color: #f4fcff;">
+                                <div class="card p-4 border border-info border-2 shadow-sm h-100 bg-white">
                                     <h5 class="fw-bold text-info border-bottom border-info pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: HUDAN ALWI ATTHOHIR</h5>
                                     
                                     <div class="mb-2">
@@ -321,7 +351,7 @@
                                         <p class="mb-2 fw-semibold">PERUM. BLURU PERMAI FP-01, SIDOARJO</p>
                                     </div>
                                     
-                                    <div class="mb-3 p-3 bg-light border border-info-subtle rounded">
+                                    <div class="mb-3 p-3 bg-light border rounded">
                                         <label class="form-label small fw-bold text-info mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
                                         <div id="rincianLayananHudan">
                                             <!-- Rendered by JS -->
@@ -364,18 +394,18 @@
 
                         <!-- Border dan Pemisah Eka / Hudan (Compact UI) -->
                         <div class="user-select-none">
-                            <div class="p-3 border border-primary border-2 rounded mb-3" style="background-color: #f0f7ff;">
+                            <div class="p-3 border border-primary border-2 rounded mb-3 bg-light" id="menuContainerEkaWrapper">
                                 <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-user me-2"></i> Layanan Eka</h6>
                                 <div class="row g-2" id="menuContainerEka"></div>
                             </div>
                             
-                            <div class="p-3 border border-info border-2 rounded mb-3" style="background-color: #f0fbff;">
+                            <div class="p-3 border border-info border-2 rounded mb-3 bg-light" id="menuContainerHudanWrapper">
                                 <h6 class="fw-bold text-info mb-2"><i class="fa-solid fa-user me-2"></i> Layanan Hudan</h6>
                                 <div class="row g-2" id="menuContainerHudan"></div>
                             </div>
                         </div>
 
-                        <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm fs-6 mt-2" onclick="confirmPenjualanModal()">
+                        <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm fs-6 mt-2 btn-action" onclick="confirmPenjualanModal()">
                             <i class="fa-solid fa-cart-shopping me-2"></i> PROSES TRANSAKSI
                         </button>
                     </div>
@@ -396,9 +426,9 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nominal (Rp)</label>
-                            <input type="number" id="nomPemasukan" class="form-control" placeholder="0">
+                            <input type="number" id="nomPemasukan" class="form-control" placeholder="0" min="1">
                         </div>
-                        <button class="btn btn-success w-100 py-3 fw-bold shadow-sm" onclick="submitSingle('input_pemasukan')">
+                        <button class="btn btn-success w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitSingle('input_pemasukan')">
                             <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN PEMASUKAN
                         </button>
                     </div>
@@ -419,9 +449,9 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nominal (Rp)</label>
-                            <input type="number" id="nomPengeluaran" class="form-control" placeholder="0">
+                            <input type="number" id="nomPengeluaran" class="form-control" placeholder="0" min="1">
                         </div>
-                        <button class="btn btn-danger w-100 py-3 fw-bold shadow-sm" onclick="submitSingle('input_pengeluaran')">
+                        <button class="btn btn-danger w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitSingle('input_pengeluaran')">
                             <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN PENGELUARAN
                         </button>
                     </div>
@@ -440,7 +470,7 @@
                             <label class="form-label fw-semibold">Keterangan Libur</label>
                             <input type="text" id="alasanLibur" class="form-control" placeholder="Contoh: Keperluan keluarga / Hari Raya">
                         </div>
-                        <button class="btn btn-secondary w-100 py-3 fw-bold shadow-sm" onclick="submitLibur()">
+                        <button class="btn btn-secondary w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitLibur()">
                             <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN CATATAN HARI LIBUR
                         </button>
                     </div>
@@ -470,7 +500,7 @@
                                 <input type="month" id="excelMonth" class="form-control">
                             </div>
                             <div class="col-md-7">
-                                <button class="btn btn-success w-100 py-2 fw-bold shadow-sm" onclick="downloadExcelReportServer()">
+                                <button class="btn btn-success w-100 py-2 fw-bold shadow-sm btn-action" onclick="downloadExcelReportServer()">
                                     <i class="fa-solid fa-file-arrow-down me-2"></i> GENERATE & DOWNLOAD EXCEL
                                 </button>
                             </div>
@@ -508,7 +538,30 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="executeSubmitPenjualan()">Ya, Simpan Transaksi</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold btn-action" onclick="executeSubmitPenjualan()">Ya, Simpan Transaksi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL KONFIRMASI HAPUS (BARU) -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i> Konfirmasi Penghapusan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Anda yakin ingin <b>menghapus permanen</b> seluruh data transaksi pada tanggal <b id="deleteConfirmDate" class="text-danger"></b>?</p>
+                <div class="p-3 bg-light border rounded text-sm mb-3" id="deleteConfirmSummary">
+                    <!-- Detail summary diisi JS -->
+                </div>
+                <p class="text-muted small mb-0"><i class="fa-solid fa-info-circle me-1"></i> Tindakan ini tidak dapat dibatalkan dan data akan hilang dari sistem.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger px-4 fw-bold btn-action" onclick="executeDeleteDate()">Ya, Hapus Data</button>
             </div>
         </div>
     </div>
@@ -522,7 +575,7 @@
                 <h5 class="modal-title fw-bold"><i class="fa-solid fa-circle-info me-2"></i> Rincian Tanggal: <span id="detailModalDate"></span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body bg-light" id="historyDetailBody">
+            <div class="modal-body bg-body" id="historyDetailBody">
                 <!-- Konten Rincian Transaksi Dit-render di sini oleh JavaScript -->
             </div>
             <div class="modal-footer">
@@ -552,11 +605,26 @@
     ];
 
     let globalData = { penjualan: [], pemasukan: [], pengeluaran: [], libur: [] };
+    let globalDatesMap = {}; // Untuk menyimpan rekap histori sementara (dibutuhkan modal hapus)
     let mainChartInstance = null;
     let productChartInstance = null;
     let productRevenueChartInstance = null;
+    let isProcessing = false; // Flag mencegah double submit
+    let targetDateToDelete = null; // Menyimpan tanggal yang akan dihapus via modal
 
-    // Helper: Mengubah string menjadi Format Kapital di Awal Kata (Contoh: Keren Eka)
+    // Tema Dark/Light Mode
+    function toggleTheme() {
+        const isDark = document.getElementById('darkModeSwitch').checked;
+        document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
+        
+        // Render ulang chart agar warnanya sesuai dengan tema
+        if (globalData.penjualan.length > 0 || globalData.pemasukan.length > 0 || globalData.pengeluaran.length > 0) {
+            renderDashboard();
+            renderProductChart();
+        }
+    }
+
+    // Helper: Mengubah string menjadi Format Kapital di Awal Kata
     function toTitleCase(str) {
         return str.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
@@ -566,6 +634,7 @@
         
         document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
         document.getElementById('excelMonth').value = today.slice(0, 7);
+        document.getElementById('inputFilterMonth').value = today.slice(0, 7); 
         document.getElementById('inputFilterProductMonth').value = today.slice(0, 7); 
         document.getElementById('inputFilterKaryawanMonth').value = today.slice(0, 7); 
 
@@ -577,8 +646,17 @@
     function showLoading(show, text = "Memproses...") {
         const overlay = document.getElementById('loadingOverlay');
         document.getElementById('loadingText').innerText = text;
-        if(show) overlay.classList.remove('d-none');
-        else overlay.classList.add('d-none');
+        
+        // Disable atau Enable semua tombol action
+        const actionBtns = document.querySelectorAll('.btn-action');
+        
+        if(show) {
+            overlay.classList.remove('d-none');
+            actionBtns.forEach(btn => btn.disabled = true);
+        } else {
+            overlay.classList.add('d-none');
+            actionBtns.forEach(btn => btn.disabled = false);
+        }
     }
 
     function showToast(msg, type = "success") {
@@ -651,6 +729,8 @@
 
     // Ambil Data dari Backend
     async function fetchAllData() {
+        if(isProcessing) return;
+        isProcessing = true;
         showLoading(true, "Mengambil data dari Server...");
         try {
             const res = await fetch(SCRIPT_URL);
@@ -668,11 +748,14 @@
         } catch(err) {
             showToast("Koneksi gagal! Periksa jaringan internet.", "danger");
         }
+        isProcessing = false;
         showLoading(false);
     }
 
     // Kirim Data ke Backend (POST)
     async function sendData(payload) {
+        if(isProcessing) return;
+        isProcessing = true;
         showLoading(true, payload.action === 'generate_rekap' ? "Menyusun Excel (Bisa Beberapa Detik)..." : "Memproses Data...");
         try {
             const res = await fetch(SCRIPT_URL, {
@@ -688,12 +771,16 @@
                 if(payload.action === 'generate_rekap' && data.url) {
                     window.location.href = data.url; 
                 } else {
-                    document.querySelectorAll('input[type="number"], input[type="text"]:not([readonly])').forEach(el => el.value = '');
+                    document.querySelectorAll('input[type="number"]:not(.qty-input), input[type="text"]:not([readonly])').forEach(el => el.value = '');
                     Object.keys(MENU).forEach(item => {
                         const qInput = document.getElementById(`qty-${item}`);
                         if(qInput) qInput.value = 0;
                     });
+                    
+                    // Supaya tidak double refresh loading, set processing false dulu
+                    isProcessing = false; 
                     fetchAllData(); 
+                    return; // exit early
                 }
             } else {
                 showToast("Gagal: " + data.message, "danger");
@@ -701,22 +788,22 @@
         } catch (err) {
             showToast("Gagal terhubung ke server backend.", "danger");
         }
+        isProcessing = false;
         showLoading(false);
     }
 
     // ==========================================
-    // RENDER FUNGSI: HISTORY DATA, DETAIL MODAL, & DELETE
+    // RENDER FUNGSI: HISTORY DATA & HAPUS
     // ==========================================
     function renderHistory() {
         const historyContainer = document.getElementById('historyContainer');
         historyContainer.innerHTML = '';
-
-        let datesMap = {};
+        globalDatesMap = {}; // Reset global map
 
         const ensureDateMap = (tgl) => {
             if (!tgl) return false;
-            if (!datesMap[tgl]) {
-                datesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0, 
+            if (!globalDatesMap[tgl]) {
+                globalDatesMap[tgl] = { penjualan: 0, pemasukan: 0, pengeluaran: 0, 
                                   totPenjualan: 0, totPemasukan: 0, totPengeluaran: 0,
                                   isLibur: false, alasanLibur: "" };
             }
@@ -726,36 +813,36 @@
         globalData.penjualan.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if (ensureDateMap(tgl)) {
-                datesMap[tgl].penjualan++;
-                datesMap[tgl].totPenjualan += Number(row.subtotal || 0);
+                globalDatesMap[tgl].penjualan++;
+                globalDatesMap[tgl].totPenjualan += Number(row.subtotal || 0);
             }
         });
         
         globalData.pemasukan.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if (ensureDateMap(tgl)) {
-                datesMap[tgl].pemasukan++;
-                datesMap[tgl].totPemasukan += Number(row.nominal || 0);
+                globalDatesMap[tgl].pemasukan++;
+                globalDatesMap[tgl].totPemasukan += Number(row.nominal || 0);
             }
         });
         
         globalData.pengeluaran.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if (ensureDateMap(tgl)) {
-                datesMap[tgl].pengeluaran++;
-                datesMap[tgl].totPengeluaran += Number(row.nominal || 0);
+                globalDatesMap[tgl].pengeluaran++;
+                globalDatesMap[tgl].totPengeluaran += Number(row.nominal || 0);
             }
         });
         
         globalData.libur.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if (ensureDateMap(tgl)) {
-                datesMap[tgl].isLibur = true;
-                datesMap[tgl].alasanLibur = row.alasan || "Libur";
+                globalDatesMap[tgl].isLibur = true;
+                globalDatesMap[tgl].alasanLibur = row.alasan || "Libur";
             }
         });
 
-        let sortedDates = Object.keys(datesMap).sort((a, b) => b.localeCompare(a));
+        let sortedDates = Object.keys(globalDatesMap).sort((a, b) => b.localeCompare(a));
 
         if (sortedDates.length === 0) {
             historyContainer.innerHTML = '<div class="alert alert-secondary border-0"><i class="fa-solid fa-circle-info me-2"></i>Belum ada data transaksi yang tersimpan.</div>';
@@ -763,7 +850,7 @@
         }
 
         sortedDates.forEach(date => {
-            let dataTgl = datesMap[date];
+            let dataTgl = globalDatesMap[date];
             let labaBersih = (dataTgl.totPenjualan + dataTgl.totPemasukan) - dataTgl.totPengeluaran;
             let classLaba = labaBersih >= 0 ? 'text-success' : 'text-danger';
 
@@ -774,13 +861,13 @@
 
             let cardHTML = `
                 <div class="card mb-3 border-secondary shadow-sm">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-calendar-day me-2 text-primary"></i> Tanggal: ${date}</h6>
+                    <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h6 class="mb-0 fw-bold text-body"><i class="fa-solid fa-calendar-day me-2 text-primary"></i> Tanggal: ${date}</h6>
                         <div>
-                            <button class="btn btn-sm btn-info text-white fw-bold shadow-sm me-2" onclick="showHistoryDetail('${date}', ${labaBersih})">
+                            <button class="btn btn-sm btn-info text-white fw-bold shadow-sm me-2 btn-action" onclick="showHistoryDetail('${date}', ${labaBersih})">
                                 <i class="fa-solid fa-eye me-1"></i> Lihat Detail
                             </button>
-                            <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="deleteDataByDate('${date}')">
+                            <button class="btn btn-sm btn-danger fw-bold shadow-sm btn-action" onclick="prepareDeleteDate('${date}')">
                                 <i class="fa-solid fa-trash me-1"></i> Hapus
                             </button>
                         </div>
@@ -847,11 +934,11 @@
             dayPemasukan.forEach(p => {
                 let nom = Number(p.nominal || 0);
                 totalPem += nom;
-                bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 small bg-white">
+                bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 small bg-body-tertiary">
                     ${p.keterangan} <span class="fw-bold text-success">Rp ${nom.toLocaleString('id-ID')}</span>
                 </li>`;
             });
-            bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 bg-light fw-bold">
+            bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 bg-body-secondary fw-bold">
                 Total Pemasukan Lain <span class="text-success">Rp ${totalPem.toLocaleString('id-ID')}</span>
             </li>`;
             bodyHtml += `</ul>`;
@@ -866,11 +953,11 @@
             dayPengeluaran.forEach(p => {
                 let nom = Number(p.nominal || 0);
                 totalPeng += nom;
-                bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 small bg-white">
+                bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 small bg-body-tertiary">
                     ${p.keterangan} <span class="fw-bold text-danger">Rp ${nom.toLocaleString('id-ID')}</span>
                 </li>`;
             });
-            bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 bg-light fw-bold">
+            bodyHtml += `<li class="list-group-item d-flex justify-content-between align-items-center p-2 bg-body-secondary fw-bold">
                 Total Pengeluaran <span class="text-danger">Rp ${totalPeng.toLocaleString('id-ID')}</span>
             </li>`;
             bodyHtml += `</ul>`;
@@ -879,8 +966,8 @@
         }
 
         bodyHtml += `
-            <div class="p-3 bg-light border border-secondary rounded shadow-sm d-flex justify-content-between align-items-center mt-4">
-                <h5 class="fw-bold m-0 text-dark">Total Laba Bersih :</h5>
+            <div class="p-3 bg-body-secondary border rounded shadow-sm d-flex justify-content-between align-items-center mt-4">
+                <h5 class="fw-bold m-0 text-body">Total Laba Bersih :</h5>
                 <h4 class="fw-bold m-0 ${classLaba}">Rp ${labaBersih.toLocaleString('id-ID')}</h4>
             </div>
         `;
@@ -890,14 +977,49 @@
         detailModal.show();
     }
 
-    function deleteDataByDate(dateString) {
-        if (confirm(`Peringatan PENTING!\n\nApakah Anda yakin ingin MENGHAPUS SEMUA DATA transaksi (penjualan, pemasukan, pengeluaran, libur) pada tanggal ${dateString} ?\n\nTindakan ini tidak dapat dibatalkan.`)) {
-            sendData({ action: "delete_by_date", tanggal: dateString });
+    // Modal Konfirmasi Hapus Data
+    function prepareDeleteDate(dateString) {
+        targetDateToDelete = dateString;
+        document.getElementById('deleteConfirmDate').innerText = dateString;
+        
+        let dataTgl = globalDatesMap[dateString];
+        let info = '';
+        
+        if (dataTgl) {
+            let totalOmzet = dataTgl.totPenjualan + dataTgl.totPemasukan;
+            info = `
+                <ul class="mb-0 ps-3">
+                    <li><b>${dataTgl.penjualan}</b> Transaksi Layanan (Rp ${dataTgl.totPenjualan.toLocaleString('id-ID')})</li>
+                    <li><b>${dataTgl.pemasukan}</b> Pemasukan Lain (Rp ${dataTgl.totPemasukan.toLocaleString('id-ID')})</li>
+                    <li><b>${dataTgl.pengeluaran}</b> Pengeluaran (Rp ${dataTgl.totPengeluaran.toLocaleString('id-ID')})</li>
+                </ul>
+                <hr class="my-2">
+                <strong>Omzet akan terhapus: <span class="text-danger">Rp ${totalOmzet.toLocaleString('id-ID')}</span></strong>
+            `;
+            if (dataTgl.isLibur) {
+                info += `<div class="mt-2 text-danger"><i class="fa-solid fa-calendar-xmark"></i> Termasuk label hari libur</div>`;
+            }
+        } else {
+            info = "Tidak ada rincian yang ditemukan untuk tanggal ini.";
+        }
+        
+        document.getElementById('deleteConfirmSummary').innerHTML = info;
+        
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        deleteModal.show();
+    }
+
+    function executeDeleteDate() {
+        if(targetDateToDelete) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            modal.hide();
+            sendData({ action: "delete_by_date", tanggal: targetDateToDelete });
+            targetDateToDelete = null; // Reset
         }
     }
 
     // ==========================================
-    // RENDER FUNGSI: DASHBOARD UTAMA
+    // RENDER FUNGSI: DASHBOARD UTAMA & GROWTH
     // ==========================================
     function updateDashboardFilterUI() {
         const mode = document.getElementById('filterMode').value;
@@ -910,6 +1032,72 @@
         if(mode === 'year') document.getElementById('inputFilterYear').classList.remove('d-none');
 
         renderDashboard();
+    }
+    
+    // Fungsi Menghitung Pertumbuhan Omzet (Penjualan + Pemasukan Lain)
+    function renderPertumbuhanOmzet(mode, currOmzet, filterDate, filterMonth, filterYear) {
+        const titleEl = document.getElementById('statPertumbuhanValue');
+        const descEl = document.getElementById('statPertumbuhanDesc');
+        
+        if (mode === 'all') {
+            titleEl.innerText = "-";
+            titleEl.className = "fw-bold mt-1 mb-0 fs-5 text-muted";
+            descEl.innerText = "Tidak berlaku untuk Seluruh Waktu";
+            return;
+        }
+
+        let prevOmzet = 0;
+        let prevFilter = '';
+
+        if (mode === 'date') {
+            let d = new Date(filterDate);
+            d.setDate(d.getDate() - 1); // Kemarin
+            prevFilter = d.toISOString().split('T')[0];
+        } else if (mode === 'month') {
+            let d = new Date(filterMonth + "-01");
+            d.setMonth(d.getMonth() - 1); // Bulan lalu
+            prevFilter = d.toISOString().substring(0, 7);
+        } else if (mode === 'year') {
+            prevFilter = (parseInt(filterYear) - 1).toString(); // Tahun lalu
+        }
+
+        // Kalkulasi omzet bulan/hari/tahun sebelumnya
+        globalData.penjualan.forEach(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if ((mode === 'date' && tgl === prevFilter) || 
+                (mode !== 'date' && tgl.startsWith(prevFilter))) {
+                prevOmzet += Number(row.subtotal || 0);
+            }
+        });
+        globalData.pemasukan.forEach(row => {
+            let tgl = String(row.tanggal || '').split('T')[0];
+            if ((mode === 'date' && tgl === prevFilter) || 
+                (mode !== 'date' && tgl.startsWith(prevFilter))) {
+                prevOmzet += Number(row.nominal || 0);
+            }
+        });
+
+        // Hitung persentase
+        let selisih = currOmzet - prevOmzet;
+        let percentage = 0;
+
+        if (prevOmzet === 0) {
+            percentage = currOmzet > 0 ? 100 : 0;
+        } else {
+            percentage = (selisih / prevOmzet) * 100;
+        }
+
+        let isPlus = selisih >= 0;
+        let signStr = isPlus ? "+" : "";
+        let colorClass = isPlus ? "text-success" : "text-danger";
+        let iconHtml = isPlus ? '<i class="fa-solid fa-arrow-trend-up"></i>' : '<i class="fa-solid fa-arrow-trend-down"></i>';
+        
+        titleEl.innerHTML = `${iconHtml} ${signStr}${percentage.toFixed(1)}%`;
+        titleEl.className = `fw-bold mt-1 mb-0 fs-5 ${colorClass}`;
+        
+        let targetCompareStr = mode === 'date' ? 'Kemarin' : (mode === 'month' ? 'Bulan Lalu' : 'Tahun Lalu');
+        descEl.innerHTML = `(Rp ${Math.abs(selisih).toLocaleString('id-ID')}) vs ${targetCompareStr}`;
+        descEl.className = `small fw-semibold mt-1 ${colorClass}`;
     }
 
     function renderDashboard() {
@@ -952,11 +1140,19 @@
         document.getElementById('statPengeluaran').innerText = `Rp ${totPengeluaran.toLocaleString('id-ID')}`;
         document.getElementById('statBersih').innerText = `Rp ${bersih.toLocaleString('id-ID')}`;
 
+        // Kalkulasi Card Omzet (Omzet = Penjualan + Pemasukan Lain)
+        renderPertumbuhanOmzet(mode, totPenjualan + totPemasukan, filterDate, filterMonth, filterYear);
+
         renderMainChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran);
     }
 
     function renderMainChart(penjualan, pemasukan, pengeluaran) {
         const ctx = document.getElementById('mainChart').getContext('2d');
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        
+        // Atur warna font Chart sesuai Tema
+        Chart.defaults.color = isDark ? '#adb5bd' : '#666';
+
         let dateMap = {};
         
         penjualan.forEach(r => {
@@ -990,8 +1186,8 @@
                 datasets: [
                     {
                         type: 'line', label: 'Pendapatan Bersih', data: dataBersih.length > 0 ? dataBersih : [0],
-                        borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3,
-                        pointBackgroundColor: '#fff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 4, tension: 0.3, fill: true, order: 1
+                        borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 3,
+                        pointBackgroundColor: isDark ? '#1e2329' : '#fff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 4, tension: 0.3, fill: true, order: 1
                     },
                     {
                         type: 'bar', label: 'Total Kotor (Penjualan+Lain)', data: dataPemasukanTotal.length > 0 ? dataPemasukanTotal : [0],
@@ -1003,7 +1199,16 @@
                     }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top' } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                interaction: { mode: 'index', intersect: false }, 
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { grid: { color: isDark ? '#30363d' : '#e5e7eb' } },
+                    y: { grid: { color: isDark ? '#30363d' : '#e5e7eb' } }
+                }
+            }
         });
     }
 
@@ -1028,6 +1233,7 @@
         const filterDate = document.getElementById('inputFilterProductDate').value;
         const filterMonth = document.getElementById('inputFilterProductMonth').value;
         const filterYear = document.getElementById('inputFilterProductYear').value;
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
         let filteredPenjualan = globalData.penjualan.filter(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
@@ -1067,20 +1273,20 @@
             totalRevenueProduk += subtotal;
         });
 
-        // Tampilkan ke dalam Card Stat & Global Details
+        // Tampilkan ke dalam Card Stat
         document.getElementById('statProductQty').innerText = `${totalQtyTerjual} Item`;
         document.getElementById('statProductRevenue').innerText = `Rp ${totalRevenueProduk.toLocaleString('id-ID')}`;
 
-        // Bikin Rincian bergaya visual grid (sama seperti analisis karyawan)
+        // Bikin Rincian bergaya visual grid
         let rincianGlobalHtml = '<div class="row g-2">';
         URUTAN_MENU.forEach(m => {
             let qty = qtyMap[m.toLowerCase()] || 0;
             let titleName = toTitleCase(m);
-            // Gunakan warna primary untuk eka, info untuk hudan (agar konsisten dengan chart dan karyawan)
             let colorClass = m.toLowerCase().includes('eka') ? 'primary' : 'info';
+            let borderColor = isDark ? 'border-secondary' : `border-${colorClass}`;
             
             rincianGlobalHtml += `<div class="col-6 col-md-4 col-lg-3">
-                                    <div class="d-flex justify-content-between align-items-center bg-white border border-${colorClass} rounded px-2 py-2 shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center bg-body border ${borderColor} rounded px-2 py-2 shadow-sm">
                                         <span class="text-secondary small fw-semibold">${titleName}</span>
                                         <span class="badge bg-${colorClass}">${qty}</span>
                                     </div>
@@ -1096,42 +1302,31 @@
         const ekaColor = 'rgba(59, 130, 246, 0.8)';
         const hudanColor = 'rgba(6, 182, 212, 0.8)';
         const bgColors = [
-            ekaColor, ekaColor, ekaColor, ekaColor, ekaColor, ekaColor, // Eka
-            hudanColor, hudanColor, hudanColor, hudanColor, hudanColor, hudanColor // Hudan
+            ekaColor, ekaColor, ekaColor, ekaColor, ekaColor, ekaColor,
+            hudanColor, hudanColor, hudanColor, hudanColor, hudanColor, hudanColor
         ];
 
-        // 1. Chart Kuantitas
+        let chartOptions = {
+            responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+            scales: { 
+                y: { beginAtZero: true, grid: { color: isDark ? '#30363d' : '#e5e7eb' }, ticks: { stepSize: 1 } }, 
+                x: { grid: { color: isDark ? '#30363d' : '#e5e7eb' }, ticks: { maxRotation: 45, minRotation: 45 } } 
+            }
+        };
+
         if(productChartInstance) productChartInstance.destroy();
         productChartInstance = new Chart(ctxQty, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Total Kuantitas Terjual', data: dataQty,
-                    backgroundColor: bgColors, borderColor: '#fff', borderWidth: 1, borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { maxRotation: 45, minRotation: 45 } } }
-            }
+            data: { labels: labels, datasets: [{ label: 'Total Kuantitas Terjual', data: dataQty, backgroundColor: bgColors, borderColor: isDark ? '#1e2329' : '#fff', borderWidth: 1, borderRadius: 4 }] },
+            options: chartOptions
         });
 
-        // 2. Chart Pendapatan (Rupiah)
         if(productRevenueChartInstance) productRevenueChartInstance.destroy();
+        chartOptions.scales.y.ticks = undefined; // hapus stepsize untuk nominal
         productRevenueChartInstance = new Chart(ctxRev, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Total Penjualan (Rp)', data: dataRev,
-                    backgroundColor: bgColors, borderColor: '#fff', borderWidth: 1, borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true }, x: { ticks: { maxRotation: 45, minRotation: 45 } } }
-            }
+            data: { labels: labels, datasets: [{ label: 'Total Penjualan (Rp)', data: dataRev, backgroundColor: bgColors, borderColor: isDark ? '#1e2329' : '#fff', borderWidth: 1, borderRadius: 4 }] },
+            options: chartOptions
         });
     }
 
@@ -1156,6 +1351,7 @@
         const filterDate = document.getElementById('inputFilterKaryawanDate').value;
         const filterMonth = document.getElementById('inputFilterKaryawanMonth').value;
         const filterYear = document.getElementById('inputFilterKaryawanYear').value;
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
         // Filter Penjualan dan Pengeluaran sesuai Waktu
         let filteredPenjualan = globalData.penjualan.filter(row => {
@@ -1177,7 +1373,6 @@
         let totalLayananEka = 0;
         let totalLayananHudan = 0;
         
-        // Objek inisiasi item agar hasil 0 tetap muncul sesuai permintaan
         let itemEka = { 'keren-eka': 0, 'ganteng-eka': 0, 'elegan-eka': 0, 'anak-eka': 0, 'ayahanak-eka': 0, 'jenggot-eka': 0 };
         let itemHudan = { 'keren-hudan': 0, 'ganteng-hudan': 0, 'elegan-hudan': 0, 'anak-hudan': 0, 'ayahanak-hudan': 0, 'jenggot-hudan': 0 };
 
@@ -1195,7 +1390,6 @@
             }
         });
 
-        // Filter Kasbon dari Pengeluaran
         let kasbonEka = 0;
         let kasbonHudan = 0;
         filteredPengeluaran.forEach(r => {
@@ -1209,14 +1403,14 @@
             }
         });
 
-        // Fungsi Helper untuk merender list item karyawan menjadi kolom grid rapi (tidak semrawut)
         const buildRincianKaryawan = (itemMap, colorClass) => {
+            let borderCls = isDark ? 'border-secondary' : `border-${colorClass}`;
             let html = '<div class="row g-2">';
             Object.keys(itemMap).forEach(k => {
                 let titleName = toTitleCase(k);
                 let qty = itemMap[k];
                 html += `<div class="col-6">
-                            <div class="d-flex justify-content-between align-items-center bg-white border border-${colorClass} rounded px-2 py-1 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center bg-body border ${borderCls} rounded px-2 py-1 shadow-sm">
                                 <span class="text-secondary small fw-semibold">${titleName}</span>
                                 <span class="badge bg-${colorClass}">${qty}</span>
                             </div>
@@ -1226,20 +1420,16 @@
             return html;
         };
 
-        // Render struktur list Karyawan ke DOM
         document.getElementById('rincianLayananEka').innerHTML = buildRincianKaryawan(itemEka, 'primary');
         document.getElementById('rincianLayananHudan').innerHTML = buildRincianKaryawan(itemHudan, 'info');
 
-        // Kalkulasi 40% Gaji Karyawan dikurangi Kasbon
         let gajiEka = (totalLayananEka * 0.40) - kasbonEka;
         let gajiHudan = (totalLayananHudan * 0.40) - kasbonHudan;
 
-        // Update DOM EKA
         document.getElementById('totalLayananEka').innerText = `Rp ${totalLayananEka.toLocaleString('id-ID')}`;
         document.getElementById('kasbonEka').innerText = `- Rp ${kasbonEka.toLocaleString('id-ID')}`;
         document.getElementById('gajiEka').innerText = `Rp ${gajiEka.toLocaleString('id-ID')}`;
 
-        // Update DOM HUDAN
         document.getElementById('totalLayananHudan').innerText = `Rp ${totalLayananHudan.toLocaleString('id-ID')}`;
         document.getElementById('kasbonHudan').innerText = `- Rp ${kasbonHudan.toLocaleString('id-ID')}`;
         document.getElementById('gajiHudan').innerText = `Rp ${gajiHudan.toLocaleString('id-ID')}`;
@@ -1265,7 +1455,7 @@
         items.forEach(i => {
             total += i.subtotal;
             let itemName = toTitleCase(i.nama);
-            summaryHtml += `<div class="d-flex justify-content-between mb-1 text-dark"><span>${itemName} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
+            summaryHtml += `<div class="d-flex justify-content-between mb-1 text-body"><span>${itemName} (x${i.qty})</span><strong>Rp ${i.subtotal.toLocaleString('id-ID')}</strong></div>`;
         });
 
         document.getElementById('checkoutSummaryList').innerHTML = summaryHtml;
@@ -1298,12 +1488,20 @@
         let ket = document.getElementById(`ket${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
         let nom = document.getElementById(`nom${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
 
+        // Validasi input
         if(!ket || !nom) {
             showToast("Harap isi keterangan dan nominal uang dengan lengkap!", "warning");
             return;
         }
+        
+        // Validasi Nominal harus > 0 (Lebih dari 0)
+        let nominalValue = parseInt(nom);
+        if(isNaN(nominalValue) || nominalValue <= 0) {
+            showToast("Nominal harus lebih besar dari 0!", "warning");
+            return;
+        }
 
-        sendData({ action: action, tanggal: tgl, keterangan: ket, nominal: parseInt(nom) });
+        sendData({ action: action, tanggal: tgl, keterangan: ket, nominal: nominalValue });
     }
 
     function submitLibur() {
