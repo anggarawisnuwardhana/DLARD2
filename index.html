@@ -524,6 +524,26 @@
     </div>
 </div>
 
+<!-- Modal Konfirmasi Umum (Digunakan untuk akumulasi data yang sama) -->
+<div class="modal fade" id="duplicateConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i> Konfirmasi Data Ganda / Akumulasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2" id="duplicateConfirmText">Data serupa sudah diinput pada tanggal yang sama. Apakah Anda ingin mengakumulasikannya?</p>
+                <div class="p-3 bg-light border rounded text-sm mb-3" id="duplicateConfirmSummary"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-warning px-4 fw-bold text-dark btn-action" id="duplicateConfirmBtn">Ya, Akumulasikan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="checkoutModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -758,6 +778,12 @@
             return;
         }
 
+        // Cek apakah ada layanan yang sudah diinput di tanggal yang sama (untuk konfirmasi ulang akumulasi)
+        let existingItemsOnDate = globalData.penjualan.filter(r => String(r.tanggal || '').split('T')[0] === tgl);
+        let hasDuplicate = itemsArray.some(newItem => 
+            existingItemsOnDate.some(ex => String(ex.item).toLowerCase() === newItem.nama.toLowerCase())
+        );
+
         let listHtml = '<ul class="list-group list-group-flush">';
         itemsArray.forEach(i => {
             listHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
@@ -767,17 +793,30 @@
         });
         listHtml += '</ul>';
 
-        document.getElementById('checkoutSummaryList').innerHTML = listHtml;
-        document.getElementById('checkoutTotalModal').innerText = `Total: Rp ${totalModal.toLocaleString('id-ID')}`;
+        if(hasDuplicate) {
+            document.getElementById('duplicateConfirmText').innerHTML = `Beberapa layanan tersebut sudah pernah diinput pada tanggal <b>${tgl}</b>. Apakah Anda ingin mengakumulasikannya ke baris yang sama?`;
+            document.getElementById('duplicateConfirmSummary').innerHTML = listHtml;
+            
+            const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+            dupModal.show();
 
-        const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
-        modal.show();
+            document.getElementById('duplicateConfirmBtn').onclick = () => {
+                dupModal.hide();
+                executeSubmitPenjualan();
+            };
+        } else {
+            document.getElementById('checkoutSummaryList').innerHTML = listHtml;
+            document.getElementById('checkoutTotalModal').innerText = `Total: Rp ${totalModal.toLocaleString('id-ID')}`;
+
+            const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+            modal.show();
+        }
     }
 
     function executeSubmitPenjualan() {
         const modalEl = document.getElementById('checkoutModal');
         const modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
+        if(modal) modal.hide();
 
         const tgl = document.getElementById('tglPenjualan').value;
         let itemsArray = [];
@@ -810,7 +849,35 @@
             return;
         }
 
-        sendDataMulti(`input_${type}`, tgl, items, type);
+        // Cek apakah ada keterangan yang sama di tanggal yang sama
+        let existingDataOnDate = globalData[type].filter(r => String(r.tanggal || '').split('T')[0] === tgl);
+        let hasDuplicate = items.some(newItem => 
+            existingDataOnDate.some(ex => String(ex.keterangan || '').toLowerCase().trim() === newItem.keterangan.toLowerCase().trim())
+        );
+
+        if(hasDuplicate) {
+            let listHtml = '<ul class="list-group list-group-flush">';
+            items.forEach(i => {
+                listHtml += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
+                    <span>${i.keterangan}</span>
+                    <span class="fw-bold">Rp ${i.nominal.toLocaleString('id-ID')}</span>
+                </li>`;
+            });
+            listHtml += '</ul>';
+
+            document.getElementById('duplicateConfirmText').innerHTML = `Beberapa keterangan ${type} ini sudah ada pada tanggal <b>${tgl}</b>. Apakah Anda ingin mengakumulasikan nominalnya?`;
+            document.getElementById('duplicateConfirmSummary').innerHTML = listHtml;
+
+            const dupModal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+            dupModal.show();
+
+            document.getElementById('duplicateConfirmBtn').onclick = () => {
+                dupModal.hide();
+                sendDataMulti(`input_${type}`, tgl, items, type);
+            };
+        } else {
+            sendDataMulti(`input_${type}`, tgl, items, type);
+        }
     }
 
     async function sendData(payload) {
