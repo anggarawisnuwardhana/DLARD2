@@ -411,7 +411,7 @@
                     </div>
                 </div>
 
-                <!-- 3. TAB PEMASUKAN -->
+                <!-- 3. TAB PEMASUKAN DINAMIS -->
                 <div class="tab-pane fade" id="pemasukan">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-success me-2"></i> Tambah Pemasukan Lain</h4>
@@ -420,21 +420,42 @@
                             <label class="form-label fw-semibold">Tanggal</label>
                             <input type="date" id="tglPemasukan" class="form-control">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Keterangan</label>
-                            <input type="text" id="ketPemasukan" class="form-control" placeholder="Contoh: Pembelian Pomade DLARD 100gr">
+                        
+                        <!-- MULTIPLE ROWS -->
+                        <div class="row g-2 mb-2">
+                            <div class="col-7">
+                                <label class="form-label fw-semibold small text-muted">Keterangan 1</label>
+                                <input type="text" id="ketPemasukan_1" class="form-control" placeholder="Contoh: Pembelian Pomade DLARD 100gr">
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label fw-semibold small text-muted">Nominal 1 (Rp)</label>
+                                <input type="number" id="nomPemasukan_1" class="form-control" placeholder="0" min="1">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nominal (Rp)</label>
-                            <input type="number" id="nomPemasukan" class="form-control" placeholder="0" min="1">
+                        <div class="row g-2 mb-2">
+                            <div class="col-7">
+                                <input type="text" id="ketPemasukan_2" class="form-control" placeholder="Keterangan 2 (Opsional)">
+                            </div>
+                            <div class="col-5">
+                                <input type="number" id="nomPemasukan_2" class="form-control" placeholder="0" min="1">
+                            </div>
                         </div>
-                        <button class="btn btn-success w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitSingle('input_pemasukan')">
+                        <div class="row g-2 mb-4">
+                            <div class="col-7">
+                                <input type="text" id="ketPemasukan_3" class="form-control" placeholder="Keterangan 3 (Opsional)">
+                            </div>
+                            <div class="col-5">
+                                <input type="number" id="nomPemasukan_3" class="form-control" placeholder="0" min="1">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitMulti('pemasukan')">
                             <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN PEMASUKAN
                         </button>
                     </div>
                 </div>
 
-                <!-- 4. TAB PENGELUARAN -->
+                <!-- 4. TAB PENGELUARAN DINAMIS -->
                 <div class="tab-pane fade" id="pengeluaran">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-receipt text-danger me-2"></i> Catat Pengeluaran / Kasbon</h4>
@@ -443,15 +464,36 @@
                             <label class="form-label fw-semibold">Tanggal</label>
                             <input type="date" id="tglPengeluaran" class="form-control">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Keterangan</label>
-                            <input type="text" id="ketPengeluaran" class="form-control" placeholder="Contoh: pengeluaran kasbon eka / kasbon hudan / Token Listrik">
+                        
+                        <!-- MULTIPLE ROWS -->
+                        <div class="row g-2 mb-2">
+                            <div class="col-7">
+                                <label class="form-label fw-semibold small text-muted">Keterangan 1</label>
+                                <input type="text" id="ketPengeluaran_1" class="form-control" placeholder="Contoh: kasbon eka / Token Listrik">
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label fw-semibold small text-muted">Nominal 1 (Rp)</label>
+                                <input type="number" id="nomPengeluaran_1" class="form-control" placeholder="0" min="1">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nominal (Rp)</label>
-                            <input type="number" id="nomPengeluaran" class="form-control" placeholder="0" min="1">
+                        <div class="row g-2 mb-2">
+                            <div class="col-7">
+                                <input type="text" id="ketPengeluaran_2" class="form-control" placeholder="Keterangan 2 (Opsional)">
+                            </div>
+                            <div class="col-5">
+                                <input type="number" id="nomPengeluaran_2" class="form-control" placeholder="0" min="1">
+                            </div>
                         </div>
-                        <button class="btn btn-danger w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitSingle('input_pengeluaran')">
+                        <div class="row g-2 mb-4">
+                            <div class="col-7">
+                                <input type="text" id="ketPengeluaran_3" class="form-control" placeholder="Keterangan 3 (Opsional)">
+                            </div>
+                            <div class="col-5">
+                                <input type="number" id="nomPengeluaran_3" class="form-control" placeholder="0" min="1">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-danger w-100 py-3 fw-bold shadow-sm btn-action" onclick="submitMulti('pengeluaran')">
                             <i class="fa-solid fa-floppy-disk me-2"></i> SIMPAN PENGELUARAN
                         </button>
                     </div>
@@ -539,6 +581,25 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
                 <button type="button" class="btn btn-primary px-4 fw-bold btn-action" onclick="executeSubmitPenjualan()">Ya, Simpan Transaksi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL KONFIRMASI DUPLIKAT (PENGINGAT GANDA) -->
+<div class="modal fade" id="duplicateConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark border-0">
+                <h5 class="modal-title fw-bold" id="dupModalTitle"><i class="fa-solid fa-triangle-exclamation me-2"></i> Konfirmasi Input</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="dupModalMsg" class="mb-0 fs-6 text-dark"></p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-warning px-4 fw-bold" id="dupModalBtnYes">Ya, Tetap Simpan</button>
             </div>
         </div>
     </div>
@@ -668,6 +729,26 @@
         toast.show();
     }
 
+    // Modal Konfirmasi Duplikat Dinamis
+    let pendingDuplicateAction = null;
+    function showDuplicateConfirm(title, msg, callback) {
+        document.getElementById('dupModalTitle').innerHTML = `<i class="fa-solid fa-triangle-exclamation me-2"></i> ${title}`;
+        document.getElementById('dupModalMsg').innerHTML = msg;
+        pendingDuplicateAction = callback;
+        
+        const modal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
+        modal.show();
+    }
+
+    document.getElementById('dupModalBtnYes').addEventListener('click', function() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateConfirmModal'));
+        modal.hide();
+        if(pendingDuplicateAction) {
+            pendingDuplicateAction();
+            pendingDuplicateAction = null;
+        }
+    });
+
     // UI Kasir Compact
     function initMenuCards() {
         const containerEka = document.getElementById('menuContainerEka');
@@ -790,6 +871,43 @@
         }
         isProcessing = false;
         showLoading(false);
+    }
+
+    // Kirim Banyak Data Secara Berurutan (Pemasukan & Pengeluaran Dinamis)
+    async function sendDataMulti(action, tgl, items, type) {
+        if(isProcessing) return;
+        isProcessing = true;
+        showLoading(true, `Menyimpan ${items.length} Baris Data...`);
+        
+        let successCount = 0;
+        try {
+            for(let i=0; i<items.length; i++) {
+                let payload = { action: action, tanggal: tgl, keterangan: items[i].keterangan, nominal: items[i].nominal };
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(data.status === 'success') successCount++;
+            }
+            
+            if(successCount > 0) {
+                showToast(`Berhasil menyimpan ${successCount} baris data ${type}!`, "success");
+                for(let i=1; i<=3; i++) {
+                    document.getElementById(`ket${toTitleCase(type)}_${i}`).value = '';
+                    document.getElementById(`nom${toTitleCase(type)}_${i}`).value = '';
+                }
+            }
+        } catch(err) {
+             showToast("Gagal terhubung ke server backend.", "danger");
+        }
+        
+        isProcessing = false;
+        showLoading(false);
+        if(successCount > 0) {
+            fetchAllData(); 
+        }
     }
 
     // ==========================================
@@ -1436,7 +1554,7 @@
     }
 
     // ==========================================
-    // CHECKOUT DAN SUBMIT TRANSAKSI LAIN
+    // CHECKOUT DAN SUBMIT TRANSAKSI PENJUALAN
     // ==========================================
     function confirmPenjualanModal() {
         const items = [];
@@ -1465,10 +1583,26 @@
         modal.show();
     }
 
+    // Tambahan Pengecekan Duplikat Penjualan Sebelum Dieksekusi
     function executeSubmitPenjualan() {
         const bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
         bootstrapModal.hide();
 
+        const tgl = document.getElementById('tglPenjualan').value;
+        const isDuplicate = globalData.penjualan.some(r => String(r.tanggal || '').split('T')[0] === tgl);
+
+        if(isDuplicate) {
+            showDuplicateConfirm(
+                "Peringatan Data Ganda", 
+                `Sudah ada data penjualan pada tanggal <b>${tgl}</b> di database. Yakin ingin menambah data lagi di tanggal yang sama?`, 
+                proceedSubmitPenjualan
+            );
+        } else {
+            proceedSubmitPenjualan();
+        }
+    }
+
+    function proceedSubmitPenjualan() {
         const items = [];
         Object.keys(MENU).forEach(item => {
             const qty = parseInt(document.getElementById(`qty-${item}`).value);
@@ -1482,26 +1616,58 @@
         });
     }
 
-    function submitSingle(action) {
-        let prefix = action.split('_')[1];
-        let tgl = document.getElementById(`tgl${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
-        let ket = document.getElementById(`ket${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
-        let nom = document.getElementById(`nom${prefix.charAt(0).toUpperCase() + prefix.slice(1)}`).value;
-
-        // Validasi input
-        if(!ket || !nom) {
-            showToast("Harap isi keterangan dan nominal uang dengan lengkap!", "warning");
-            return;
-        }
+    // ==========================================
+    // FUNGSI SUBMIT MULTIPLE PEMASUKAN & PENGELUARAN
+    // ==========================================
+    function submitMulti(type) { // 'pemasukan' atau 'pengeluaran'
+        let action = type === 'pemasukan' ? 'input_pemasukan' : 'input_pengeluaran';
+        let tgl = document.getElementById(`tgl${toTitleCase(type)}`).value;
+        let items = [];
         
-        // Validasi Nominal harus > 0 (Lebih dari 0)
-        let nominalValue = parseInt(nom);
-        if(isNaN(nominalValue) || nominalValue <= 0) {
-            showToast("Nominal harus lebih besar dari 0!", "warning");
+        for(let i=1; i<=3; i++) {
+            let ket = document.getElementById(`ket${toTitleCase(type)}_${i}`).value;
+            let nom = parseInt(document.getElementById(`nom${toTitleCase(type)}_${i}`).value);
+            
+            if(ket && !isNaN(nom) && nom > 0) {
+                items.push({keterangan: ket, nominal: nom});
+            } else if ((ket && (!nom || nom <= 0)) || (!ket && nom > 0)) {
+                showToast(`Baris ke-${i}: Harap lengkapi deskripsi beserta nominal lebih dari 0.`, "warning");
+                return;
+            }
+        }
+
+        if(items.length === 0) {
+            showToast("Harap isi setidaknya 1 baris keterangan dan nominal dengan benar!", "warning");
             return;
         }
 
-        sendData({ action: action, tanggal: tgl, keterangan: ket, nominal: nominalValue });
+        let duplicateFound = false;
+        let dupKet = "";
+        let existingData = type === 'pemasukan' ? globalData.pemasukan : globalData.pengeluaran;
+        
+        // Pengecekan Duplikat
+        for(let i=0; i<items.length; i++) {
+            let check = existingData.some(r => 
+                String(r.tanggal || '').split('T')[0] === tgl && 
+                String(r.keterangan || '').trim().toLowerCase() === items[i].keterangan.trim().toLowerCase()
+            );
+            
+            if(check) {
+                duplicateFound = true;
+                dupKet = items[i].keterangan;
+                break;
+            }
+        }
+
+        if(duplicateFound) {
+            showDuplicateConfirm(
+                "Peringatan Keterangan Ganda", 
+                `Keterangan <b>"${dupKet}"</b> pada tanggal <b>${tgl}</b> sudah pernah diinput hari ini. Yakin ingin menginputnya lagi?`, 
+                function() { sendDataMulti(action, tgl, items, type); }
+            );
+        } else {
+            sendDataMulti(action, tgl, items, type);
+        }
     }
 
     function submitLibur() {
