@@ -26,7 +26,6 @@
 
         body { background-color: var(--bg-body); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s, color 0.3s; }
         
-        /* Utility anti block text (disable selection) */
         .user-select-none {
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -34,11 +33,9 @@
             user-select: none;
         }
 
-        /* Navbar */
         .navbar { background-color: var(--primary-color) !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .navbar-brand { font-weight: 700; letter-spacing: 0.5px; }
 
-        /* Sidebar / Tabs Styling */
         .nav-pills .nav-link {
             color: #64748b;
             font-weight: 600;
@@ -50,10 +47,8 @@
         .nav-pills .nav-link:hover { background-color: var(--bs-secondary-bg); color: var(--bs-body-color); }
         .nav-pills .nav-link.active { background-color: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 
-        /* Card Modern */
         .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); transition: transform 0.2s; background-color: var(--bs-body-bg); }
         
-        /* Item Card Compact Version */
         .item-card { 
             border: 1px solid var(--bs-border-color); 
             border-radius: 8px; 
@@ -70,10 +65,8 @@
         .qty-btn { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; }
         .qty-input { width: 40px; height: 28px; text-align: center; border: 1px solid var(--bs-border-color); border-radius: 6px; margin: 0 6px; font-weight: 600; font-size: 14px; background: var(--bs-body-bg); color: var(--bs-body-color);}
 
-        /* Stat Cards */
         .stat-card { border-left: 4px solid var(--accent-color); }
         
-        /* Tema Khusus (Custom Cards di Dark Mode) */
         [data-bs-theme="dark"] .bg-white { background-color: #1e2329 !important; border-color: #30363d !important; }
         [data-bs-theme="dark"] .bg-light { background-color: #21262d !important; }
         [data-bs-theme="dark"] .text-dark { color: #f0f6fc !important; }
@@ -81,7 +74,6 @@
         [data-bs-theme="dark"] .text-muted { color: #8b949e !important; }
         [data-bs-theme="dark"] #menuContainerEka .border-primary, [data-bs-theme="dark"] #menuContainerHudan .border-info { border-color: #30363d !important; background-color: #1e2329 !important; }
 
-        /* Loading Spinner Fullscreen Overlay */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(var(--bs-body-bg-rgb), 0.85); z-index: 9999;
@@ -91,18 +83,15 @@
 </head>
 <body>
 
-<!-- LOADING SPRAY OVERLAY -->
 <div id="loadingOverlay" class="d-none">
     <div class="spinner-border text-primary mb-2" role="status" style="width: 3rem; height: 3rem;"></div>
     <h6 class="fw-bold" id="loadingText" style="color: var(--bs-body-color);">Menghubungkan ke Server...</h6>
 </div>
 
-<!-- NAVBAR -->
 <nav class="navbar navbar-dark sticky-top">
     <div class="container-fluid px-4">
         <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-scissors me-2"></i>DLARD 2 BARBERSHOP</span>
         <div class="d-flex align-items-center">
-            <!-- Toggle Dark Mode -->
             <div class="form-check form-switch me-4">
                 <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" onchange="toggleTheme()">
                 <label class="form-check-label text-light" for="darkModeSwitch"><i class="fa-solid fa-moon"></i> Dark</label>
@@ -114,7 +103,6 @@
 
 <div class="container-fluid px-4 py-4">
     <div class="row">
-        <!-- SIDEBAR NAVIGATION -->
         <div class="col-lg-3 mb-4">
             <div class="card p-3 sticky-top" style="top: 80px;">
                 <div class="nav flex-column nav-pills" id="posTabs" role="tablist">
@@ -131,11 +119,9 @@
             </div>
         </div>
 
-        <!-- MAIN CONTENT CONTAINER -->
         <div class="col-lg-9">
             <div class="tab-content" id="posTabsContent">
 
-                <!-- 1. TAB DASHBOARD & GRAFIK -->
                 <div class="tab-pane fade show active" id="dashboard">
                     <div class="card p-4 mb-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
@@ -154,7 +140,6 @@
                             </div>
                         </div>
 
-                        <!-- Stat Cards Grid -->
                         <div class="row g-3 mb-4">
                             <div class="col">
                                 <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4 h-100">
@@ -180,7 +165,6 @@
                                     <h6 class="fw-bold text-info mt-1 mb-0 fs-5" id="statBersih">Rp 0</h6>
                                 </div>
                             </div>
-                            <!-- Card Baru: Pertumbuhan Omzet -->
                             <div class="col">
                                 <div class="card stat-card p-3 bg-white shadow-sm border-start border-warning border-4 h-100">
                                     <span class="text-muted small fw-semibold">Pertumbuhan Omzet</span>
@@ -203,7 +187,6 @@
                     </div>
                 </div>
 
-                <!-- 1.B. TAB ANALISIS PENJUALAN PRODUK -->
                 <div class="tab-pane fade" id="analisis_produk">
                     <div class="card p-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
@@ -224,7 +207,6 @@
                         </div>
                         <p class="text-muted small mb-3">Lihat performa layanan Anda dari segi Kuantitas Terjual maupun Total Pendapatan Rupiah.</p>
 
-                        <!-- Stat Ringkasan Produk & Rincian Qty -->
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4">
@@ -240,20 +222,16 @@
                             </div>
                         </div>
 
-                        <!-- Card Rincian Kuantitas Item Terjual -->
                         <div class="row mb-4">
                             <div class="col-12">
                                 <div class="p-3 bg-light border rounded shadow-sm">
                                     <span class="text-secondary small fw-bold mb-3 d-block"><i class="fa-solid fa-list me-1"></i> Rincian Jumlah Item Terjual (Global):</span>
-                                    <div id="rincianProdukGlobal">
-                                        <!-- Di-render oleh JavaScript dengan tampilan grid rapi -->
-                                    </div>
+                                    <div id="rincianProdukGlobal"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row g-4">
-                            <!-- Grafik Kuantitas -->
                             <div class="col-md-6">
                                 <div class="card p-3 bg-white border shadow-sm">
                                     <h6 class="fw-bold text-secondary mb-3 text-center">Grafik Kuantitas Terjual</h6>
@@ -262,7 +240,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Grafik Pendapatan / Penjualan Total -->
                             <div class="col-md-6">
                                 <div class="card p-3 bg-white border shadow-sm">
                                     <h6 class="fw-bold text-secondary mb-3 text-center">Grafik Total Penjualan (Rp)</h6>
@@ -275,7 +252,6 @@
                     </div>
                 </div>
 
-                <!-- 1.C. TAB ANALISIS KARYAWAN -->
                 <div class="tab-pane fade" id="analisis_karyawan">
                     <div class="card p-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
@@ -297,7 +273,6 @@
                         <p class="text-muted small mb-4">Dashboard profil karyawan dan kalkulasi estimasi gaji. <br><b>Rumus:</b> (Subtotal Hasil Penjualan x 40%) - Catatan Kasbon.</p>
                         
                         <div class="row g-4">
-                            <!-- BORDER EKA -->
                             <div class="col-md-6">
                                 <div class="card p-4 border border-primary border-2 shadow-sm h-100 bg-white">
                                     <h5 class="fw-bold text-primary border-bottom border-primary pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: EKA NUR BARIZA</h5>
@@ -313,9 +288,7 @@
 
                                     <div class="mb-3 p-3 bg-light border rounded">
                                         <label class="form-label small fw-bold text-primary mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
-                                        <div id="rincianLayananEka">
-                                            <!-- Rendered by JS -->
-                                        </div>
+                                        <div id="rincianLayananEka"></div>
                                     </div>
                                     
                                     <div class="p-3 bg-white border rounded shadow-sm mt-auto">
@@ -337,7 +310,6 @@
                                 </div>
                             </div>
                             
-                            <!-- BORDER HUDAN -->
                             <div class="col-md-6">
                                 <div class="card p-4 border border-info border-2 shadow-sm h-100 bg-white">
                                     <h5 class="fw-bold text-info border-bottom border-info pb-2 mb-3"><i class="fa-solid fa-user-tie me-2"></i>Profil: HUDAN ALWI ATTHOHIR</h5>
@@ -353,9 +325,7 @@
                                     
                                     <div class="mb-3 p-3 bg-light border rounded">
                                         <label class="form-label small fw-bold text-info mb-2"><i class="fa-solid fa-list me-1"></i> Rincian Penjualan Layanan</label>
-                                        <div id="rincianLayananHudan">
-                                            <!-- Rendered by JS -->
-                                        </div>
+                                        <div id="rincianLayananHudan"></div>
                                     </div>
 
                                     <div class="p-3 bg-white border rounded shadow-sm mt-auto">
@@ -380,7 +350,6 @@
                     </div>
                 </div>
 
-                <!-- 2. TAB KASIR PENJUALAN -->
                 <div class="tab-pane fade" id="penjualan">
                     <div class="card p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -392,7 +361,6 @@
                         </div>
                         <hr class="text-muted mb-3">
 
-                        <!-- Border dan Pemisah Eka / Hudan (Compact UI) -->
                         <div class="user-select-none">
                             <div class="p-3 border border-primary border-2 rounded mb-3 bg-light" id="menuContainerEkaWrapper">
                                 <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-user me-2"></i> Layanan Eka</h6>
@@ -411,7 +379,6 @@
                     </div>
                 </div>
 
-                <!-- 3. TAB PEMASUKAN DINAMIS -->
                 <div class="tab-pane fade" id="pemasukan">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-success me-2"></i> Tambah Pemasukan Lain</h4>
@@ -421,7 +388,6 @@
                             <input type="date" id="tglPemasukan" class="form-control">
                         </div>
                         
-                        <!-- MULTIPLE ROWS -->
                         <div class="row g-2 mb-2">
                             <div class="col-7">
                                 <label class="form-label fw-semibold small text-muted">Keterangan 1</label>
@@ -455,7 +421,6 @@
                     </div>
                 </div>
 
-                <!-- 4. TAB PENGELUARAN DINAMIS -->
                 <div class="tab-pane fade" id="pengeluaran">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-receipt text-danger me-2"></i> Catat Pengeluaran / Kasbon</h4>
@@ -465,7 +430,6 @@
                             <input type="date" id="tglPengeluaran" class="form-control">
                         </div>
                         
-                        <!-- MULTIPLE ROWS -->
                         <div class="row g-2 mb-2">
                             <div class="col-7">
                                 <label class="form-label fw-semibold small text-muted">Keterangan 1</label>
@@ -499,7 +463,6 @@
                     </div>
                 </div>
 
-                <!-- 5. TAB LIBUR -->
                 <div class="tab-pane fade" id="libur">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-calendar-xmark text-secondary me-2"></i> Catat Libur</h4>
@@ -518,19 +481,16 @@
                     </div>
                 </div>
 
-                <!-- 5.B TAB HISTORY DAN DELETE -->
                 <div class="tab-pane fade" id="history">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> History & Manajemen Data</h4>
                         <p class="text-muted small">Kelola riwayat input data (Penjualan, Pemasukan, Pengeluaran, Libur) per tanggal. Klik <b>Lihat Detail</b> untuk rincian, atau Hapus untuk mereset seluruh transaksi pada tanggal tersebut.</p>
                         <hr class="text-muted mb-4">
                         
-                        <!-- Tempat Render History Dinamis -->
                         <div id="historyContainer"></div>
                     </div>
                 </div>
 
-                <!-- 6. TAB LAPORAN EXCEL -->
                 <div class="tab-pane fade" id="laporan">
                     <div class="card p-4">
                         <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-excel text-success me-2"></i> Export & Download Laporan Excel</h4>
@@ -555,7 +515,6 @@
     </div>
 </div>
 
-<!-- TOAST NOTIFICATION CONTAINER -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
     <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
@@ -565,7 +524,6 @@
     </div>
 </div>
 
-<!-- MODAL KONFIRMASI CHECKOUT PENJUALAN -->
 <div class="modal fade" id="checkoutModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -586,26 +544,6 @@
     </div>
 </div>
 
-<!-- MODAL KONFIRMASI DUPLIKAT (PENGINGAT GANDA) -->
-<div class="modal fade" id="duplicateConfirmModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark border-0">
-                <h5 class="modal-title fw-bold" id="dupModalTitle"><i class="fa-solid fa-triangle-exclamation me-2"></i> Konfirmasi Input</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p id="dupModalMsg" class="mb-0 fs-6 text-dark"></p>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-warning px-4 fw-bold" id="dupModalBtnYes">Ya, Tetap Simpan</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL KONFIRMASI HAPUS (BARU) -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -615,9 +553,7 @@
             </div>
             <div class="modal-body">
                 <p class="mb-3">Anda yakin ingin <b>menghapus permanen</b> seluruh data transaksi pada tanggal <b id="deleteConfirmDate" class="text-danger"></b>?</p>
-                <div class="p-3 bg-light border rounded text-sm mb-3" id="deleteConfirmSummary">
-                    <!-- Detail summary diisi JS -->
-                </div>
+                <div class="p-3 bg-light border rounded text-sm mb-3" id="deleteConfirmSummary"></div>
                 <p class="text-muted small mb-0"><i class="fa-solid fa-info-circle me-1"></i> Tindakan ini tidak dapat dibatalkan dan data akan hilang dari sistem.</p>
             </div>
             <div class="modal-footer">
@@ -628,7 +564,6 @@
     </div>
 </div>
 
-<!-- MODAL DETAIL HISTORY -->
 <div class="modal fade" id="historyDetailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -636,9 +571,7 @@
                 <h5 class="modal-title fw-bold"><i class="fa-solid fa-circle-info me-2"></i> Rincian Tanggal: <span id="detailModalDate"></span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body bg-body" id="historyDetailBody">
-                <!-- Konten Rincian Transaksi Dit-render di sini oleh JavaScript -->
-            </div>
+            <div class="modal-body bg-body" id="historyDetailBody"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Tutup</button>
             </div>
@@ -646,14 +579,10 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ===============================================
-    // MASUKKAN URL DEPLOYMENT APPS SCRIPT ANDA DI SINI
-    // ===============================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydD0IS2l0qAhUiiyz5lD-9DgXMIi6C6y0UzvMpoDkmAsSSHZkx8-Ux49E3y1gisrewNA/exec";
+    const SCRIPT_URL = "MASUKKAN_URL_DEPLOYMENT_APPS_SCRIPT_ANDA_DI_SINI";
 
     const MENU = {
         "keren-eka": 35000, "ganteng-eka": 40000, "elegan-eka": 45000, "anak-eka": 30000, "ayahanak-eka": 60000, "jenggot-eka": 15000,
@@ -666,26 +595,22 @@
     ];
 
     let globalData = { penjualan: [], pemasukan: [], pengeluaran: [], libur: [] };
-    let globalDatesMap = {}; // Untuk menyimpan rekap histori sementara (dibutuhkan modal hapus)
+    let globalDatesMap = {}; 
     let mainChartInstance = null;
     let productChartInstance = null;
     let productRevenueChartInstance = null;
-    let isProcessing = false; // Flag mencegah double submit
-    let targetDateToDelete = null; // Menyimpan tanggal yang akan dihapus via modal
+    let isProcessing = false; 
+    let targetDateToDelete = null; 
 
-    // Tema Dark/Light Mode
     function toggleTheme() {
         const isDark = document.getElementById('darkModeSwitch').checked;
         document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
-        
-        // Render ulang chart agar warnanya sesuai dengan tema
         if (globalData.penjualan.length > 0 || globalData.pemasukan.length > 0 || globalData.pengeluaran.length > 0) {
             renderDashboard();
             renderProductChart();
         }
     }
 
-    // Helper: Mengubah string menjadi Format Kapital di Awal Kata
     function toTitleCase(str) {
         return str.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
@@ -707,8 +632,6 @@
     function showLoading(show, text = "Memproses...") {
         const overlay = document.getElementById('loadingOverlay');
         document.getElementById('loadingText').innerText = text;
-        
-        // Disable atau Enable semua tombol action
         const actionBtns = document.querySelectorAll('.btn-action');
         
         if(show) {
@@ -729,27 +652,6 @@
         toast.show();
     }
 
-    // Modal Konfirmasi Duplikat Dinamis
-    let pendingDuplicateAction = null;
-    function showDuplicateConfirm(title, msg, callback) {
-        document.getElementById('dupModalTitle').innerHTML = `<i class="fa-solid fa-triangle-exclamation me-2"></i> ${title}`;
-        document.getElementById('dupModalMsg').innerHTML = msg;
-        pendingDuplicateAction = callback;
-        
-        const modal = new bootstrap.Modal(document.getElementById('duplicateConfirmModal'));
-        modal.show();
-    }
-
-    document.getElementById('dupModalBtnYes').addEventListener('click', function() {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateConfirmModal'));
-        modal.hide();
-        if(pendingDuplicateAction) {
-            pendingDuplicateAction();
-            pendingDuplicateAction = null;
-        }
-    });
-
-    // UI Kasir Compact
     function initMenuCards() {
         const containerEka = document.getElementById('menuContainerEka');
         const containerHudan = document.getElementById('menuContainerHudan');
@@ -808,7 +710,6 @@
         });
     }
 
-    // Ambil Data dari Backend
     async function fetchAllData() {
         if(isProcessing) return;
         isProcessing = true;
@@ -833,11 +734,10 @@
         showLoading(false);
     }
 
-    // Kirim Data ke Backend (POST)
     async function sendData(payload) {
         if(isProcessing) return;
         isProcessing = true;
-        showLoading(true, payload.action === 'generate_rekap' ? "Menyusun Excel (Bisa Beberapa Detik)..." : "Memproses Data...");
+        showLoading(true, payload.action === 'generate_rekap' ? "Menyusun Excel..." : "Menyimpan & Mengakumulasi Data...");
         try {
             const res = await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -858,10 +758,9 @@
                         if(qInput) qInput.value = 0;
                     });
                     
-                    // Supaya tidak double refresh loading, set processing false dulu
                     isProcessing = false; 
                     fetchAllData(); 
-                    return; // exit early
+                    return; 
                 }
             } else {
                 showToast("Gagal: " + data.message, "danger");
@@ -873,11 +772,10 @@
         showLoading(false);
     }
 
-    // Kirim Banyak Data Secara Berurutan (Pemasukan & Pengeluaran Dinamis)
     async function sendDataMulti(action, tgl, items, type) {
         if(isProcessing) return;
         isProcessing = true;
-        showLoading(true, `Menyimpan ${items.length} Baris Data...`);
+        showLoading(true, `Menyimpan & Mengakumulasi ${items.length} Baris Data...`);
         
         let successCount = 0;
         try {
@@ -893,7 +791,7 @@
             }
             
             if(successCount > 0) {
-                showToast(`Berhasil menyimpan ${successCount} baris data ${type}!`, "success");
+                showToast(`Berhasil menyimpan & mengakumulasi ${successCount} baris data ${type}!`, "success");
                 for(let i=1; i<=3; i++) {
                     document.getElementById(`ket${toTitleCase(type)}_${i}`).value = '';
                     document.getElementById(`nom${toTitleCase(type)}_${i}`).value = '';
@@ -910,13 +808,10 @@
         }
     }
 
-    // ==========================================
-    // RENDER FUNGSI: HISTORY DATA & HAPUS
-    // ==========================================
     function renderHistory() {
         const historyContainer = document.getElementById('historyContainer');
         historyContainer.innerHTML = '';
-        globalDatesMap = {}; // Reset global map
+        globalDatesMap = {}; 
 
         const ensureDateMap = (tgl) => {
             if (!tgl) return false;
@@ -1095,7 +990,6 @@
         detailModal.show();
     }
 
-    // Modal Konfirmasi Hapus Data
     function prepareDeleteDate(dateString) {
         targetDateToDelete = dateString;
         document.getElementById('deleteConfirmDate').innerText = dateString;
@@ -1132,13 +1026,10 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
             modal.hide();
             sendData({ action: "delete_by_date", tanggal: targetDateToDelete });
-            targetDateToDelete = null; // Reset
+            targetDateToDelete = null; 
         }
     }
 
-    // ==========================================
-    // RENDER FUNGSI: DASHBOARD UTAMA & GROWTH
-    // ==========================================
     function updateDashboardFilterUI() {
         const mode = document.getElementById('filterMode').value;
         document.getElementById('inputFilterDate').classList.add('d-none');
@@ -1152,7 +1043,6 @@
         renderDashboard();
     }
     
-    // Fungsi Menghitung Pertumbuhan Omzet (Penjualan + Pemasukan Lain)
     function renderPertumbuhanOmzet(mode, currOmzet, filterDate, filterMonth, filterYear) {
         const titleEl = document.getElementById('statPertumbuhanValue');
         const descEl = document.getElementById('statPertumbuhanDesc');
@@ -1169,17 +1059,16 @@
 
         if (mode === 'date') {
             let d = new Date(filterDate);
-            d.setDate(d.getDate() - 1); // Kemarin
+            d.setDate(d.getDate() - 1);
             prevFilter = d.toISOString().split('T')[0];
         } else if (mode === 'month') {
             let d = new Date(filterMonth + "-01");
-            d.setMonth(d.getMonth() - 1); // Bulan lalu
+            d.setMonth(d.getMonth() - 1);
             prevFilter = d.toISOString().substring(0, 7);
         } else if (mode === 'year') {
-            prevFilter = (parseInt(filterYear) - 1).toString(); // Tahun lalu
+            prevFilter = (parseInt(filterYear) - 1).toString();
         }
 
-        // Kalkulasi omzet bulan/hari/tahun sebelumnya
         globalData.penjualan.forEach(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if ((mode === 'date' && tgl === prevFilter) || 
@@ -1195,7 +1084,6 @@
             }
         });
 
-        // Hitung persentase
         let selisih = currOmzet - prevOmzet;
         let percentage = 0;
 
@@ -1258,17 +1146,13 @@
         document.getElementById('statPengeluaran').innerText = `Rp ${totPengeluaran.toLocaleString('id-ID')}`;
         document.getElementById('statBersih').innerText = `Rp ${bersih.toLocaleString('id-ID')}`;
 
-        // Kalkulasi Card Omzet (Omzet = Penjualan + Pemasukan Lain)
         renderPertumbuhanOmzet(mode, totPenjualan + totPemasukan, filterDate, filterMonth, filterYear);
-
         renderMainChart(filteredPenjualan, filteredPemasukan, filteredPengeluaran);
     }
 
     function renderMainChart(penjualan, pemasukan, pengeluaran) {
         const ctx = document.getElementById('mainChart').getContext('2d');
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-        
-        // Atur warna font Chart sesuai Tema
         Chart.defaults.color = isDark ? '#adb5bd' : '#666';
 
         let dateMap = {};
@@ -1330,9 +1214,6 @@
         });
     }
 
-    // ==========================================
-    // RENDER FUNGSI: ANALISIS PRODUK
-    // ==========================================
     function updateProductFilterUI() {
         const mode = document.getElementById('filterProductMode').value;
         document.getElementById('inputFilterProductDate').classList.add('d-none');
@@ -1391,11 +1272,9 @@
             totalRevenueProduk += subtotal;
         });
 
-        // Tampilkan ke dalam Card Stat
         document.getElementById('statProductQty').innerText = `${totalQtyTerjual} Item`;
         document.getElementById('statProductRevenue').innerText = `Rp ${totalRevenueProduk.toLocaleString('id-ID')}`;
 
-        // Bikin Rincian bergaya visual grid
         let rincianGlobalHtml = '<div class="row g-2">';
         URUTAN_MENU.forEach(m => {
             let qty = qtyMap[m.toLowerCase()] || 0;
@@ -1440,7 +1319,7 @@
         });
 
         if(productRevenueChartInstance) productRevenueChartInstance.destroy();
-        chartOptions.scales.y.ticks = undefined; // hapus stepsize untuk nominal
+        chartOptions.scales.y.ticks = undefined; 
         productRevenueChartInstance = new Chart(ctxRev, {
             type: 'bar',
             data: { labels: labels, datasets: [{ label: 'Total Penjualan (Rp)', data: dataRev, backgroundColor: bgColors, borderColor: isDark ? '#1e2329' : '#fff', borderWidth: 1, borderRadius: 4 }] },
@@ -1448,9 +1327,6 @@
         });
     }
 
-    // ==========================================
-    // RENDER FUNGSI: ANALISIS KARYAWAN
-    // ==========================================
     function updateKaryawanFilterUI() {
         const mode = document.getElementById('filterKaryawanMode').value;
         document.getElementById('inputFilterKaryawanDate').classList.add('d-none');
@@ -1471,7 +1347,6 @@
         const filterYear = document.getElementById('inputFilterKaryawanYear').value;
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
-        // Filter Penjualan dan Pengeluaran sesuai Waktu
         let filteredPenjualan = globalData.penjualan.filter(row => {
             let tgl = String(row.tanggal || '').split('T')[0];
             if(mode === 'date') return tgl === filterDate;
@@ -1553,9 +1428,6 @@
         document.getElementById('gajiHudan').innerText = `Rp ${gajiHudan.toLocaleString('id-ID')}`;
     }
 
-    // ==========================================
-    // CHECKOUT DAN SUBMIT TRANSAKSI PENJUALAN
-    // ==========================================
     function confirmPenjualanModal() {
         const items = [];
         Object.keys(MENU).forEach(item => {
@@ -1583,26 +1455,10 @@
         modal.show();
     }
 
-    // Tambahan Pengecekan Duplikat Penjualan Sebelum Dieksekusi
     function executeSubmitPenjualan() {
         const bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
         bootstrapModal.hide();
 
-        const tgl = document.getElementById('tglPenjualan').value;
-        const isDuplicate = globalData.penjualan.some(r => String(r.tanggal || '').split('T')[0] === tgl);
-
-        if(isDuplicate) {
-            showDuplicateConfirm(
-                "Peringatan Data Ganda", 
-                `Sudah ada data penjualan pada tanggal <b>${tgl}</b> di database. Yakin ingin menambah data lagi di tanggal yang sama?`, 
-                proceedSubmitPenjualan
-            );
-        } else {
-            proceedSubmitPenjualan();
-        }
-    }
-
-    function proceedSubmitPenjualan() {
         const items = [];
         Object.keys(MENU).forEach(item => {
             const qty = parseInt(document.getElementById(`qty-${item}`).value);
@@ -1616,10 +1472,7 @@
         });
     }
 
-    // ==========================================
-    // FUNGSI SUBMIT MULTIPLE PEMASUKAN & PENGELUARAN
-    // ==========================================
-    function submitMulti(type) { // 'pemasukan' atau 'pengeluaran'
+    function submitMulti(type) { 
         let action = type === 'pemasukan' ? 'input_pemasukan' : 'input_pengeluaran';
         let tgl = document.getElementById(`tgl${toTitleCase(type)}`).value;
         let items = [];
@@ -1641,33 +1494,7 @@
             return;
         }
 
-        let duplicateFound = false;
-        let dupKet = "";
-        let existingData = type === 'pemasukan' ? globalData.pemasukan : globalData.pengeluaran;
-        
-        // Pengecekan Duplikat
-        for(let i=0; i<items.length; i++) {
-            let check = existingData.some(r => 
-                String(r.tanggal || '').split('T')[0] === tgl && 
-                String(r.keterangan || '').trim().toLowerCase() === items[i].keterangan.trim().toLowerCase()
-            );
-            
-            if(check) {
-                duplicateFound = true;
-                dupKet = items[i].keterangan;
-                break;
-            }
-        }
-
-        if(duplicateFound) {
-            showDuplicateConfirm(
-                "Peringatan Keterangan Ganda", 
-                `Keterangan <b>"${dupKet}"</b> pada tanggal <b>${tgl}</b> sudah pernah diinput hari ini. Yakin ingin menginputnya lagi?`, 
-                function() { sendDataMulti(action, tgl, items, type); }
-            );
-        } else {
-            sendDataMulti(action, tgl, items, type);
-        }
+        sendDataMulti(action, tgl, items, type);
     }
 
     function submitLibur() {
