@@ -132,11 +132,11 @@
                                 <select id="filterMode" class="form-select form-select-sm" onchange="updateDashboardFilterUI()">
                                     <option value="all">Seluruh Waktu</option>
                                     <option value="date">Per Tanggal</option>
-                                    <option value="month">Per Bulan</option>
+                                    <option value="month" selected>Per Bulan</option>
                                     <option value="year">Per Tahun</option>
                                 </select>
                                 <input type="date" id="inputFilterDate" class="form-control form-control-sm d-none" onchange="renderDashboard()">
-                                <input type="month" id="inputFilterMonth" class="form-control form-control-sm d-none" onchange="renderDashboard()">
+                                <input type="month" id="inputFilterMonth" class="form-control form-control-sm" onchange="renderDashboard()">
                                 <select id="inputFilterYear" class="form-select form-select-sm d-none" onchange="renderDashboard()"></select>
                             </div>
                         </div>
@@ -198,11 +198,11 @@
                                 <select id="filterProductMode" class="form-select form-select-sm" onchange="updateProductFilterUI()">
                                     <option value="all">Seluruh Waktu</option>
                                     <option value="date">Per Tanggal</option>
-                                    <option value="month">Per Bulan</option>
+                                    <option value="month" selected>Per Bulan</option>
                                     <option value="year">Per Tahun</option>
                                 </select>
                                 <input type="date" id="inputFilterProductDate" class="form-control form-control-sm d-none" onchange="renderProductChart()">
-                                <input type="month" id="inputFilterProductMonth" class="form-control form-control-sm d-none" onchange="renderProductChart()">
+                                <input type="month" id="inputFilterProductMonth" class="form-control form-control-sm" onchange="renderProductChart()">
                                 <select id="inputFilterProductYear" class="form-select form-select-sm d-none" onchange="renderProductChart()"></select>
                             </div>
                         </div>
@@ -263,11 +263,11 @@
                                 <select id="filterKaryawanMode" class="form-select form-select-sm" onchange="updateKaryawanFilterUI()">
                                     <option value="all">Seluruh Waktu</option>
                                     <option value="date">Per Tanggal</option>
-                                    <option value="month">Per Bulan</option>
+                                    <option value="month" selected>Per Bulan</option>
                                     <option value="year">Per Tahun</option>
                                 </select>
                                 <input type="date" id="inputFilterKaryawanDate" class="form-control form-control-sm d-none" onchange="renderKaryawanDashboard()">
-                                <input type="month" id="inputFilterKaryawanMonth" class="form-control form-control-sm d-none" onchange="renderKaryawanDashboard()">
+                                <input type="month" id="inputFilterKaryawanMonth" class="form-control form-control-sm" onchange="renderKaryawanDashboard()">
                                 <select id="inputFilterKaryawanYear" class="form-select form-select-sm d-none" onchange="renderKaryawanDashboard()"></select>
                             </div>
                         </div>
@@ -497,10 +497,10 @@
                             <label class="fw-semibold text-muted fs-6">Filter Waktu:</label>
                             <select id="filterHistoryMode" class="form-select form-select-sm w-auto" onchange="updateHistoryFilterUI()">
                                 <option value="all">Seluruh Waktu</option>
-                                <option value="month">Per Bulan</option>
+                                <option value="month" selected>Per Bulan</option>
                                 <option value="year">Per Tahun</option>
                             </select>
-                            <input type="month" id="inputFilterHistoryMonth" class="form-control form-control-sm w-auto d-none" onchange="renderHistory()">
+                            <input type="month" id="inputFilterHistoryMonth" class="form-control form-control-sm w-auto" onchange="renderHistory()">
                             <select id="inputFilterHistoryYear" class="form-select form-select-sm w-auto d-none" onchange="renderHistory()"></select>
                         </div>
                         
