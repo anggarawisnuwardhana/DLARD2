@@ -123,7 +123,6 @@
         <div class="col-lg-9">
             <div class="tab-content" id="posTabsContent">
 
-                <!-- [DASHBOARD, ANALISIS PRODUK, ANALISIS KARYAWAN TABS - OMITTED FOR BREVITY BUT KEPT IN ACTUAL CODE] -->
                 <div class="tab-pane fade show active" id="dashboard">
                     <div class="card p-4 mb-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
@@ -358,7 +357,7 @@
                     </div>
                 </div>
 
-                <!-- TAB BARU: ANALISIS KEUANGAN -->
+                <!-- ANALISIS KEUANGAN DIPERBARUI -->
                 <div class="tab-pane fade" id="analisis_keuangan">
                     <div class="card p-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
@@ -377,74 +376,74 @@
                                 <select id="inputFilterKeuanganYear" class="form-select form-select-sm d-none" onchange="renderKeuanganDashboard()"></select>
                             </div>
                         </div>
-                        <p class="text-muted small mb-4">Ringkasan transaksi keuangan termasuk subtotal, penjualan spesifik, pemasukan lain, pengeluaran QRIS, dan kasbon.</p>
+                        <p class="text-muted small mb-4">Ringkasan transaksi keuangan yang dikelompokkan sesuai dengan perputaran dana harian dan bulanan.</p>
                         
-                        <div class="row g-3">
-                            <!-- Subtotal -->
-                            <div class="col-md-4">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4 h-100">
-                                    <span class="text-muted small fw-semibold">Subtotal (Semua Penjualan & Pemasukan)</span>
-                                    <h5 class="fw-bold text-primary mt-1 mb-0" id="keuanganSubtotal">Rp 0</h5>
+                        <!-- KELOMPOK 1 -->
+                        <div class="border border-primary border-2 rounded p-3 mb-4 bg-light">
+                            <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-chart-pie me-2"></i>Kelompok 1: Ringkasan Utama</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="card stat-card p-3 bg-white shadow-sm border-start border-primary border-4 h-100">
+                                        <span class="text-muted small fw-semibold">Subtotal Pemasukan</span>
+                                        <h5 class="fw-bold text-primary mt-1 mb-0" id="keuanganSubtotal">Rp 0</h5>
+                                    </div>
                                 </div>
-                            </div>
-                            <!-- Keren Eka -->
-                            <div class="col-md-4">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4 h-100">
-                                    <span class="text-muted small fw-semibold">Penjualan Keren - Eka</span>
-                                    <h5 class="fw-bold text-info mt-1 mb-0" id="keuanganKerenEka">0 Item (Rp 0)</h5>
+                                <div class="col-md-4">
+                                    <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4 h-100">
+                                        <span class="text-muted small fw-semibold">Pendapatan Bersih</span>
+                                        <h5 class="fw-bold text-info mt-1 mb-0" id="keuanganBersih">Rp 0</h5>
+                                    </div>
                                 </div>
-                            </div>
-                            <!-- Keren Hudan -->
-                            <div class="col-md-4">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-info border-4 h-100">
-                                    <span class="text-muted small fw-semibold">Penjualan Keren - Hudan</span>
-                                    <h5 class="fw-bold text-info mt-1 mb-0" id="keuanganKerenHudan">0 Item (Rp 0)</h5>
-                                </div>
-                            </div>
-                            
-                            <!-- Pengeluaran QRIS -->
-                            <div class="col-md-4">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-danger border-4 h-100">
-                                    <span class="text-muted small fw-semibold">Pengeluaran QRIS (Full Akumulasi)</span>
-                                    <h5 class="fw-bold text-danger mt-1 mb-0" id="keuanganQris">Rp 0</h5>
-                                </div>
-                            </div>
-                            <!-- Kasbon Eka -->
-                            <div class="col-md-4">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-warning border-4 h-100">
-                                    <span class="text-muted small fw-semibold">Kasbon Eka</span>
-                                    <h5 class="fw-bold text-warning mt-1 mb-0" id="keuanganKasbonEka">Rp 0</h5>
-                                </div>
-                            </div>
-                            <!-- Kasbon Hudan -->
-                            <div class="col-md-4">
-                                <div class="card stat-card p-3 bg-white shadow-sm border-start border-warning border-4 h-100">
-                                    <span class="text-muted small fw-semibold">Kasbon Hudan</span>
-                                    <h5 class="fw-bold text-warning mt-1 mb-0" id="keuanganKasbonHudan">Rp 0</h5>
-                                </div>
-                            </div>
-
-                            <!-- Pemasukan Lain -->
-                            <div class="col-12 mt-4">
-                                <div class="card p-3 bg-white shadow-sm border">
-                                    <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-list me-2"></i>Rincian Pemasukan Lain-lain</h6>
-                                    <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
-                                        <table class="table table-sm table-hover table-bordered mb-0">
-                                            <thead class="table-light sticky-top">
-                                                <tr>
-                                                    <th>Tanggal</th>
-                                                    <th>Keterangan</th>
-                                                    <th class="text-end">Nominal</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="keuanganPemasukanLainList">
-                                                <!-- Populated by JS -->
-                                            </tbody>
-                                        </table>
+                                <div class="col-md-4">
+                                    <div class="card stat-card p-3 bg-white shadow-sm border-start border-danger border-4 h-100">
+                                        <span class="text-muted small fw-semibold">Total QRIS</span>
+                                        <h5 class="fw-bold text-danger mt-1 mb-0" id="keuanganQrisGroup1">Rp 0</h5>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- KELOMPOK 2 -->
+                        <div class="border border-success border-2 rounded p-3 mb-4 bg-light">
+                            <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-list me-2"></i>Kelompok 2: Pemasukan Lain-lain</h6>
+                            <div class="card p-3 bg-white shadow-sm border">
+                                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                    <table class="table table-sm table-hover table-bordered mb-0">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th>Keterangan</th>
+                                                <th class="text-end">Nominal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="keuanganPemasukanLainList">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KELOMPOK 3 -->
+                        <div class="border border-danger border-2 rounded p-3 bg-light">
+                            <h6 class="fw-bold text-danger mb-3"><i class="fa-solid fa-receipt me-2"></i>Kelompok 3: Akumulasi Pengeluaran</h6>
+                            <div class="card p-3 bg-white shadow-sm border">
+                                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                    <table class="table table-sm table-hover table-bordered mb-0">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th>Keterangan (Akumulasi)</th>
+                                                <th class="text-end">Total Nominal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="keuanganPengeluaranList">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -1222,7 +1221,6 @@
 
         let sortedDates = Object.keys(globalDatesMap).sort((a, b) => b.localeCompare(a));
         
-        // Filter history dates
         let mode = document.getElementById('filterHistoryMode').value;
         let filterMonth = document.getElementById('inputFilterHistoryMonth').value;
         let filterYear = document.getElementById('inputFilterHistoryYear').value;
@@ -1406,7 +1404,6 @@
         }
     }
 
-    // DASHBOARD & ANALYTICS RENDER FUNCTIONS (OMITTED FOR BREVITY BUT FULLY INTACT)
     function updateDashboardFilterUI() {
         const mode = document.getElementById('filterMode').value;
         document.getElementById('inputFilterDate').classList.add('d-none');
@@ -1810,7 +1807,7 @@
         document.getElementById('gajiHudan').innerText = `Rp ${gajiHudan.toLocaleString('id-ID')}`;
     }
 
-    // FUNGSI BARU: ANALISIS KEUANGAN
+    // FUNGSI ANALISIS KEUANGAN DIPERBARUI
     function updateKeuanganFilterUI() {
         const mode = document.getElementById('filterKeuanganMode').value;
         document.getElementById('inputFilterKeuanganDate').classList.add('d-none');
@@ -1855,30 +1852,17 @@
             return true;
         });
 
-        let subtotal = 0; 
-        let kerenEkaQty = 0, kerenEkaRp = 0;
-        let kerenHudanQty = 0, kerenHudanRp = 0;
-        let qrisRp = 0;
-        let kasbonEkaRp = 0;
-        let kasbonHudanRp = 0;
+        let subtotalPemasukan = 0; 
+        let totalPengeluaran = 0;
+        let qrisGroup1 = 0;
 
-        // Kalkulasi Penjualan
+        // Kalkulasi Penjualan (Hanya untuk Subtotal)
         filteredPenjualan.forEach(r => {
             let sub = Number(r.subtotal || 0);
-            subtotal += sub;
-            let item = String(r.item).toLowerCase();
-            let qty = Number(r.qty || 0);
-            
-            if(item === 'keren-eka') {
-                kerenEkaQty += qty;
-                kerenEkaRp += sub;
-            } else if(item === 'keren-hudan') {
-                kerenHudanQty += qty;
-                kerenHudanRp += sub;
-            }
+            subtotalPemasukan += sub;
         });
 
-        // Kalkulasi Pemasukan Lain-lain
+        // Kalkulasi Pemasukan Lain-lain (Masuk ke Subtotal & Render List)
         let pemasukanHtml = '';
         if(filteredPemasukan.length === 0) {
             pemasukanHtml = '<tr><td colspan="3" class="text-center text-muted fst-italic">Tidak ada data pemasukan lain</td></tr>';
@@ -1886,7 +1870,7 @@
 
         filteredPemasukan.forEach(r => {
             let nom = Number(r.nominal || 0);
-            subtotal += nom;
+            subtotalPemasukan += nom;
             
             pemasukanHtml += `<tr>
                 <td>${String(r.tanggal || '').split('T')[0]}</td>
@@ -1895,28 +1879,54 @@
             </tr>`;
         });
 
-        // Kalkulasi Pengeluaran QRIS dan Kasbon
+        // Kalkulasi Pengeluaran QRIS dan Akumulasi Seluruh Pengeluaran Grouping per Nama
+        let pengeluaranMap = {};
+        
         filteredPengeluaran.forEach(r => {
-            let ket = String(r.keterangan || '').toLowerCase();
+            let ket = String(r.keterangan || '').trim();
+            let ketLower = ket.toLowerCase();
             let nom = Number(r.nominal || 0);
             
-            if(ket.includes('qris')) {
-                qrisRp += nom;
-            } else if(ket.includes('kasbon eka')) {
-                kasbonEkaRp += nom;
-            } else if(ket.includes('kasbon hudan')) {
-                kasbonHudanRp += nom;
+            totalPengeluaran += nom;
+            
+            // Catat khusus qris untuk tampil di Kelompok 1
+            if(ketLower.includes('qris')) {
+                qrisGroup1 += nom;
             }
+
+            // Simpan data akumulasi berdasarkan nama pengeluaran
+            if(!pengeluaranMap[ketLower]) {
+                pengeluaranMap[ketLower] = { namaOriginal: ket, total: 0 };
+            }
+            pengeluaranMap[ketLower].total += nom;
         });
 
-        // Update UI
-        document.getElementById('keuanganSubtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
-        document.getElementById('keuanganKerenEka').innerText = `${kerenEkaQty} Item (Rp ${kerenEkaRp.toLocaleString('id-ID')})`;
-        document.getElementById('keuanganKerenHudan').innerText = `${kerenHudanQty} Item (Rp ${kerenHudanRp.toLocaleString('id-ID')})`;
-        document.getElementById('keuanganQris').innerText = `Rp ${qrisRp.toLocaleString('id-ID')}`;
-        document.getElementById('keuanganKasbonEka').innerText = `Rp ${kasbonEkaRp.toLocaleString('id-ID')}`;
-        document.getElementById('keuanganKasbonHudan').innerText = `Rp ${kasbonHudanRp.toLocaleString('id-ID')}`;
+        let pendapatanBersih = subtotalPemasukan - totalPengeluaran;
+
+        // Render List Akumulasi Pengeluaran
+        let pengeluaranHtml = '';
+        let pengeluaranKeys = Object.keys(pengeluaranMap);
+        
+        if(pengeluaranKeys.length === 0) {
+            pengeluaranHtml = '<tr><td colspan="2" class="text-center text-muted fst-italic">Tidak ada data pengeluaran</td></tr>';
+        } else {
+            // Sort list agar rapi secara alfabet
+            pengeluaranKeys.sort().forEach(k => {
+                let item = pengeluaranMap[k];
+                pengeluaranHtml += `<tr>
+                    <td class="text-capitalize">${item.namaOriginal}</td>
+                    <td class="text-end text-danger fw-semibold">Rp ${item.total.toLocaleString('id-ID')}</td>
+                </tr>`;
+            });
+        }
+
+        // Update UI HTML
+        document.getElementById('keuanganSubtotal').innerText = `Rp ${subtotalPemasukan.toLocaleString('id-ID')}`;
+        document.getElementById('keuanganBersih').innerText = `Rp ${pendapatanBersih.toLocaleString('id-ID')}`;
+        document.getElementById('keuanganQrisGroup1').innerText = `Rp ${qrisGroup1.toLocaleString('id-ID')}`;
+        
         document.getElementById('keuanganPemasukanLainList').innerHTML = pemasukanHtml;
+        document.getElementById('keuanganPengeluaranList').innerHTML = pengeluaranHtml;
     }
 </script>
 </body>
