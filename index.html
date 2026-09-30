@@ -2048,38 +2048,39 @@ function renderArusKas() {
     // 1. Akumulasi Total Penjualan per Bulan
     let penjualanPerBulan = {};
     globalData.penjualan.forEach(p => {
-        // Cari key 'tanggal' mengabaikan spasi
-        let keyTanggal = Object.keys(p).find(k => k.trim().toLowerCase() === 'tanggal') || 'tanggal';
-        if(!p[keyTanggal]) return;
-
-        let dateStr = String(p[keyTanggal]);
+        let dateStr = String(p.tanggal);
         let bulanStr = dateStr.includes('T') ? dateStr.split('T')[0].substring(0, 7) : dateStr.substring(0, 7); // Format: YYYY-MM
         
-        let keySubtotal = Object.keys(p).find(k => k.trim().toLowerCase() === 'subtotal') || 'subtotal';
-        let subtotal = Number(p[keySubtotal]) || 0;
-        
+        let subtotal = Number(p.subtotal) || 0;
         if(!penjualanPerBulan[bulanStr]) penjualanPerBulan[bulanStr] = 0;
         penjualanPerBulan[bulanStr] += subtotal;
     });
 
-    // 2. Akumulasi Pengeluaran Barber per Bulan
+   // 2. Akumulasi Pengeluaran Barber per Bulan
     let pengeluaranPerBulan = {};
     if (globalData.pengeluaranBarber) {
         globalData.pengeluaranBarber.forEach(p => {
-            // Cari key 'bulan' yang mengabaikan kemungkinan adanya spasi dari Google Sheet ("Bulan ")
-            let keyBulan = Object.keys(p).find(k => k.trim().toLowerCase() === 'bulan') || 'bulan';
-            if (!p[keyBulan]) return;
+            // Mencari key 'bulan' secara dinamis untuk mencegah error akibat spasi tidak sengaja (misal: "bulan ")
+            let keyBulan = Object.keys(p).find(k => k.trim().toLowerCase() === 'bulan' || k.trim().toLowerCase() === 'tanggal');
+            let rawBulan = keyBulan ? p[keyBulan] : "";
             
-            let dateStr = String(p[keyBulan]).trim();
-            // Pastikan formatnya selalu diambil 7 karakter pertama saja (YYYY-MM)
-            let bulanStr = dateStr.includes('T') ? dateStr.split('T')[0].substring(0, 7) : dateStr.substring(0, 7);
+            let bulanStr = String(rawBulan).trim();
             
-            // Cari key nominal mengabaikan spasi
-            let keyNominal = Object.keys(p).find(k => k.trim().toLowerCase() === 'nominal') || 'nominal';
-            let nom = Number(p[keyNominal]) || 0;
+            // Memastikan format yang terambil hanya YYYY-MM (7 karakter pertama)
+            // Ini mencegah error jika Google Sheets memaksakan format menjadi YYYY-MM-DD
+            if (bulanStr.includes('T')) {
+                bulanStr = bulanStr.split('T')[0].substring(0, 7);
+            } else if (bulanStr.length >= 7) {
+                bulanStr = bulanStr.substring(0, 7);
+            }
+
+            let nom = Number(p.nominal) || 0;
             
-            if(!pengeluaranPerBulan[bulanStr]) pengeluaranPerBulan[bulanStr] = 0;
-            pengeluaranPerBulan[bulanStr] += nom;
+            // Abaikan data kosong atau yang tidak valid
+            if (bulanStr && bulanStr !== "undefined") {
+                if(!pengeluaranPerBulan[bulanStr]) pengeluaranPerBulan[bulanStr] = 0;
+                pengeluaranPerBulan[bulanStr] += nom;
+            }
         });
     }
 
@@ -2094,9 +2095,6 @@ function renderArusKas() {
     let dataBersih = [];
 
     allMonths.forEach(bulan => {
-        // Abaikan data jika string bulan tidak valid (mencegah render 'undefined')
-        if (!bulan || bulan === "undefin" || bulan.includes("undefined")) return;
-
         let totalPenjualan = penjualanPerBulan[bulan] || 0;
         let hakBarber = totalPenjualan * 0.60; // 60% Hak Barber
         let pengeluaran = pengeluaranPerBulan[bulan] || 0;
@@ -2117,7 +2115,7 @@ function renderArusKas() {
         `;
     });
 
-    if (labels.length === 0) {
+    if (allMonths.length === 0) {
         tableBody = `<tr><td colspan="4" class="text-muted py-3">Belum ada data bulan ini</td></tr>`;
     }
     
@@ -2126,6 +2124,53 @@ function renderArusKas() {
 
     // Render Grafik Chart.js
     renderArusKasChart(labels, dataHakBarber, dataPengeluaran, dataBersih);
+}
+
+let arusKasChartInstance = null;
+function renderArusKasChart(labels, hakBarber, pengeluaran, bersih) {
+    const ctx = document.getElementById('arusKasChart');
+    if(!ctx) return;
+    
+    if (arusKasChartInstance) arusKasChartInstance.destroy();
+
+    arusKasChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Hak Barber (60%)',
+                    data: hakBarber,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Pengeluaran',
+                    data: pengeluaran,
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Pendapatan Bersih',
+                    data: bersih,
+                    type: 'line', // Grafik garis agar mudah dibaca trennya
+                    fill: false,
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgb(34, 197, 94)',
+                    tension: 0.2,
+                    borderWidth: 3,
+                    pointRadius: 5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
 }
     
 </script>
